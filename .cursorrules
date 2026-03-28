@@ -1,0 +1,38 @@
+# LoadLink MSME Dashboard - Final Spec Reference
+
+## FINAL SCHEMA REFERENCE (use ONLY these columns)
+
+```sql
+profiles     → id (uuid), role (text), name (text), email (text), home_city (text)
+trucks       → id, driver_id, vehicle_number, vehicle_type, capacity_kg, capacity_volume, ulip_verified, created_at
+routes       → id, truck_id, origin, destination, origin_location (geography), destination_location (geography),
+               departure_time, expected_arrival, is_return_trip, available_capacity_kg, status, created_at
+shipments    → id, business_id, pickup_address, drop_address, pickup_location (geography), drop_location (geography),
+               weight_kg, price, is_partial, status
+matches      → id, route_id, shipment_id, match_score, detour_km, status, created_at
+bookings     → id, shipment_id, driver_id, business_id, route_id, agreed_price, status, created_at
+payments     → id, booking_id, amount, payment_status, payment_method, transaction_id, created_at
+messages     → id, shipment_id, sender_id, receiver_id, content, type, metadata, is_read, created_at
+tracking     → id, booking_id, location (geography), speed, recorded_at
+reviews      → id, driver_id, business_id, booking_id, rating, comment, created_at
+sustainability → id, route_id, distance_saved_km, fuel_saved_liters, co2_reduction_kg, created_at
+route_cache  → id, url_hash, route_data, created_at
+```
+
+## BOOKING STATUS ENUM
+`bookings.status`: 'requested' | 'in_progress' | 'completed' | 'cancelled'
+
+## AUTH ARCHITECTURE
+- /login → Sign In
+- /signup → Sign Up + profile creation
+- Protected Routes: Redirect role !== 'business' to /unauthorized
+
+## REALTIME RULES
+- Use `supabase.channel()` for realtime updates.
+- Always clean up subscriptions in useEffect returns.
+- Longitude FIRST for geography: `POINT(lng lat)`.
+
+## TYPE SAFETY
+- No `any` types allowed.
+- Use `Database` type from `@/types/database.types`.
+- Use `parseGeoPoint` for PostGIS mapping.

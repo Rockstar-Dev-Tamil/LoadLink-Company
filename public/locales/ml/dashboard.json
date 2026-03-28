@@ -1,0 +1,12 @@
+{
+  "welcome": "സ്വാഗതം",
+  "stats": { 
+    "totalRevenue": "ആകെ വരുമാനം", 
+    "activeShipments": "സജീവ ഷിപ്പുമെന്റുകൾ", 
+    "pendingSettlements": "തീർപ്പുകൽപ്പിക്കാത്തവ", 
+    "co2Saved": "CO₂ ലാഭിച്ചു",
+    "pendingMatches": "തീർപ്പുകൽപ്പിക്കാത്ത വസ്‌തുക്കൾ",
+    "walletBalance": "വാലറ്റ് ബാലൻസ്"
+  },
+  "create_cta": "ഷിപ്പുമെന്റ് ബുക്ക് ചെയ്യുക"
+}

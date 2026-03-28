@@ -1,0 +1,34 @@
+{
+  "welcome": "Welcome back",
+  "stats": { 
+    "active_shipments": "Active Shipments", 
+    "revenue_collected": "Revenue Collected",
+    "cost_efficiency": "Cost Efficiency",
+    "co2_saved": "CO₂ Saved",
+    "completed_shipments": "completed shipments",
+    "pending_label": "Pending",
+    "efficiency_label": "Based on delivered shipments",
+    "distance_saved_label": "km saved",
+    "pending_settlements": "Pending settlements",
+    "failed_payments": "Failed payments",
+    "reliability": "Reliability",
+    "reliability_value": "98.4%"
+  },
+  "sections": {
+    "recent_shipments": "Recent shipments",
+    "recent_subtitle": "A quick view of the latest shipment activity.",
+    "glance_title": "Today at a glance",
+    "glance_subtitle": "Critical operating metrics.",
+    "load_description": "{{weight}} kg load • Rs {{price}}"
+  },
+  "empty": {
+    "no_shipments": "No shipments yet",
+    "create_first": "Create your first load request and we will surface the best available capacity.",
+    "start_booking": "Start booking"
+  },
+  "actions": {
+    "view_flow": "View shipment flow",
+    "book_now": "Book Shipment"
+  },
+  "create_cta": "Book Shipment"
+}

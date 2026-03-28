@@ -1,0 +1,32 @@
+{
+  "nav": {
+    "dashboard": "டேஷ்போர்டு",
+    "active_shipments": "செயலில் உள்ள சரக்குகள்",
+    "book_shipment": "சரக்கு முன்பதிவு",
+    "payments": "பணம் செலுத்துதல்",
+    "analytics": "ஆய்வு",
+    "settings": "அமைப்புகள்",
+    "shipments": "சரக்குகள்",
+    "tracking": "கண்காணிப்பு",
+    "logout": "வெளியேறு"
+  },
+  "account": {
+    "partner": "கூட்டாளர்",
+    "type_suffix": "கணக்கு",
+    "sign_out": "வெளியேறு"
+  },
+  "status": {
+    "pending": "நிலுவையில் உள்ளது",
+    "matched": "பொருத்தப்பட்டது",
+    "in_progress": "நடந்து கொண்டிருக்கிறது",
+    "delivered": "சேர்க்கப்பட்டது",
+    "canceled": "ரத்து செய்யப்பட்டது",
+    "requested": "கோரப்பட்டது"
+  },
+  "buttons": {
+    "save": "சேமி",
+    "cancel": "ரத்து",
+    "close": "மூடு",
+    "confirm": "உறுதிப்படுத்து"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "welcome": "स्वागत है",
+  "stats": { 
+    "totalRevenue": "कुल राजस्व", 
+    "activeShipments": "सक्रिय शिपमेंट", 
+    "pendingSettlements": "लंबित निपटान", 
+    "co2Saved": "CO₂ की बचत",
+    "pendingMatches": "लंबित मिलान",
+    "walletBalance": "वॉलेट बैलेंस"
+  },
+  "create_cta": "शिपमेंट बुक करें"
+}

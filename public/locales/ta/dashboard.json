@@ -1,0 +1,33 @@
+{
+  "welcome": "நல்வரவு",
+  "stats": {
+    "active_shipments": "செயலில் உள்ள சரக்குகள்",
+    "revenue_collected": "வசூலிக்கப்பட்ட வருவாய்",
+    "cost_efficiency": "செலவு திறன்",
+    "co2_saved": "CO₂ சேமிப்பு",
+    "completed_shipments": "நிறைவுற்ற சரக்குகள்",
+    "pending_label": "நிலுவையில்",
+    "efficiency_label": "நிறைவுற்ற சரக்குகளின் அடிப்படையில்",
+    "distance_saved_label": "கி.மீ சேமிப்பு",
+    "pending_settlements": "நிலுவையில் உள்ள தீர்வுகள்",
+    "failed_payments": "தோல்வியுற்ற பணம் செலுத்துதல்",
+    "reliability": "நம்பகத்தன்மை",
+    "reliability_value": "98.4%"
+  },
+  "sections": {
+    "recent_shipments": "சமீபத்திய சரக்குகள்",
+    "recent_subtitle": "சமீபத்திய சரக்கு நடவடிக்கைகளின் விரைவான பார்வை.",
+    "glance_title": "இன்றைய பார்வை",
+    "glance_subtitle": "முக்கிய செயல்பாட்டு அளவீடுகள்.",
+    "load_description": "{{weight}} கிலோ எடை • Rs {{price}}"
+  },
+  "empty": {
+    "no_shipments": "சரக்குகள் எதுவும் இல்லை",
+    "create_first": "உங்கள் முதல் சரக்கு கோரிக்கையை உருவாக்கவும், சிறந்த திறனை நாங்கள் கண்டறிவோம்.",
+    "start_booking": "முன்பதிவு செய்ய"
+  },
+  "actions": {
+    "view_flow": "சரக்கு ஓட்டத்தைப் பார்க்க",
+    "book_now": "சரக்கு முன்பதிவு"
+  }
+}

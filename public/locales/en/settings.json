@@ -1,0 +1,32 @@
+{
+  "title": "Control Center",
+  "subtitle": "Manage your profile and application preferences",
+  "nav": {
+    "profile": "Company Profile",
+    "preferences": "Preferences",
+    "security": "Security & Access",
+    "notifications": "Notification Hub"
+  },
+  "sections": {
+    "business_profile": {
+      "title": "Business Profile",
+      "subtitle": "Public identity on the LoadLink network",
+      "org_name": "Organization Name",
+      "hq_city": "Headquarters City",
+      "admin_email": "Admin Email (Verified)",
+      "placeholder_name": "Enter business name",
+      "placeholder_city": "e.g. Chennai",
+      "save_button": "Save Profile Securely",
+      "saving": "Committing Changes..."
+    },
+    "regional": {
+      "title": "Regional Settings",
+      "subtitle": "Localization and language preferences"
+    }
+  },
+  "toast": {
+    "success": "Profile updated successfully!",
+    "failed": "Failed to update profile",
+    "language_changed": "Language changed to {{lng}}"
+  }
+}

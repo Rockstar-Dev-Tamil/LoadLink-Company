@@ -1,0 +1,40 @@
+{
+  "title": "Logistics Intelligence",
+  "subtitle": "Deep insights into your supply chain performance and efficiency.",
+  "actions": {
+    "export": "Export Analytics"
+  },
+  "cards": {
+    "total_shipments": "Total Shipments",
+    "active_loads": "Active Loads",
+    "reliability_rate": "Reliability Rate",
+    "avg_cost": "Avg Shipment Cost"
+  },
+  "sections": {
+    "strategic_trends": "Strategic Trends",
+    "route_efficiency": "Route Efficiency Grid",
+    "sustainability": "Sustainability Impact",
+    "network_performance": "Network Performance",
+    "decision_support": "Decision Support"
+  },
+  "metrics": {
+    "revenue": "Revenue",
+    "efficiency": "Efficiency",
+    "carbon_reduction": "Carbon Reduction",
+    "fuel_saved": "Fuel Saved",
+    "km_saved": "KM Saved",
+    "sla_compliance": "SLA Compliance",
+    "swift_settlement": "Swift Settlement",
+    "swift_settlement_desc": "92% faster than industry avg",
+    "growth_index": "Growth Index",
+    "growth_index_desc": "+14% month-over-month"
+  },
+  "insights": {
+    "bengaluru_tip": "\"Routes to Bengaluru are showing high match density. Consider centralizing inventory there for 12% lower transport costs.\"",
+    "tree_equivalent": "\"Your CO2 savings this month are equivalent to planting 14 trees in the Nilgiris.\"",
+    "fuel_saved_match": "Matching Return Trips saved 18% on fuel costs this period."
+  },
+  "toast": {
+    "compiling": "Report compiling. Check your email."
+  }
+}

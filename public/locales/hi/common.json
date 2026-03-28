@@ -1,0 +1,7 @@
+{
+  "nav": { "dashboard": "डैशबोर्ड", "tracking": "ट्रैकिंग", "payments": "भुगतान", "analytics": "एनालिटिक्स" },
+  "stats": { "totalRevenue": "कुल राजस्व", "activeShipments": "सक्रिय शिपमेंट", "pendingSettlements": "लंबित निपटान", "co2Saved": "CO₂ की बचत" },
+  "actions": { "book": "शिपमेंट बुक करें", "track": "लोड ट्रैक करें", "export": "रिपोर्ट निर्यात करें", "filter": "फ़िल्टर" },
+  "status": { "paid": "भुगतान किया गया", "pending": "लंबित", "failed": "विफल", "inTransit": "रास्ते में" },
+  "chatbot": { "placeholder": "लोडलिंक असिस्टेंट से पूछें...", "send": "भेजें", "greeting": "नमस्ते! आज मैं आपके माल ढुलाई में कैसे मदद कर सकता हूँ?" }
+}

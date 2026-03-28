@@ -1,0 +1,57 @@
+{
+  "steps": {
+    "details": "1. Shipment Details",
+    "selection": "2. Match Selection"
+  },
+  "form": {
+    "title": "Create new load request",
+    "subtitle": "We'll find the most efficient empty-leg truck near your origin.",
+    "origin_label": "Origin Point",
+    "origin_placeholder": "e.g. CFS Warehouse, Chennai Port",
+    "destination_label": "Destination Point",
+    "destination_placeholder": "e.g. Industrial Estate, Bengaluru",
+    "weight_label": "Total Weight (Tons)",
+    "config_label": "Load Configuration",
+    "ai_pricing": "AI Optimized Pricing Engaged",
+    "find_matches": "Find Matches",
+    "searching": "Searching..."
+  },
+  "edge": {
+    "title": "LoadLink Edge",
+    "features": [
+      {
+        "title": "Smart Deadhead Discovery",
+        "desc": "We tap into over 5,000 trucks returning empty to their home cities."
+      },
+      {
+        "title": "Guaranteed Verified Drivers",
+        "desc": "Every truck on LoadLink is ULIP-verified with clean safety records."
+      },
+      {
+        "title": "Instant Asset Tracking",
+        "desc": "From the second you book, get millisecond-latency GPS tracking."
+      }
+    ]
+  },
+  "selection": {
+    "title": "Shipment Published",
+    "subtitle": "Your load is now visible to the Match Engine. We are calculating the most efficient truck alignments in real-time.",
+    "scanning": "Scanning Grid for Capacity...",
+    "waiting": "Waiting for AI matches",
+    "waiting_desc": "New matches will appear here automatically as soon as drivers bid.",
+    "top_match": "Top Match",
+    "match_score": "Match Score",
+    "est_price": "Est. Price",
+    "accept_book": "Accept & Book",
+    "securing": "Securing...",
+    "back": "Back to Details",
+    "tracking": "Go to Tracking"
+  },
+  "toast": {
+    "login_required": "Please log in to book a shipment",
+    "request_published": "Shipment request published!",
+    "failed_create": "Failed to create shipment",
+    "match_accepted": "Match accepted! Routing to active shipments.",
+    "failed_accept": "Failed to accept match"
+  }
+}

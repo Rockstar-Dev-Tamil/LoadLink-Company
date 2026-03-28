@@ -1,0 +1,32 @@
+{
+  "header": {
+    "title": "Live Fleet Monitor",
+    "deployments": "Active Deployments"
+  },
+  "details": {
+    "selected_node": "Selected Node",
+    "origin": "Origin",
+    "carrier_assigned": "Carrier Assigned",
+    "matching_carrier": "Matching Carrier...",
+    "driver_label": "Driver",
+    "open_chat": "Open Secure Chat",
+    "payload": "Payload",
+    "value": "Value"
+  },
+  "empty": {
+    "no_missions": "No active missions",
+    "deploy_ready": "Ready to deploy? Your live fleet will appear here once booked.",
+    "start_booking": "Start Booking"
+  },
+  "flow": {
+    "switch_terminal": "Switch Terminal Flow",
+    "id_prefix": "ID:"
+  },
+  "intelligence": {
+    "title": "Live Transit Intelligence",
+    "distance": "Distance",
+    "eta": "ETA",
+    "min": "min",
+    "km_remaining": "km remaining"
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "title": "Wealth & Settlements",
+  "subtitle": "Monitor your logistics spend and settle pending invoices securely.",
+  "stats": {
+    "totalRevenue": "Total Expenditures",
+    "totalRevenue_description": "Aggregate shipping costs to date",
+    "pending": "Escrow / Pending",
+    "pending_description": "Awaiting delivery confirmation",
+    "completed": "Settled Shipments",
+    "completed_description": "Successfully processed payments",
+    "failed": "Transaction Faults",
+    "failed_description": "Payments requiring manual review"
+  },
+  "history": "Transaction Ledger",
+  "filters": {
+    "all_status": "All Statuses",
+    "all_time": "All Time",
+    "last_7_days": "Last 7 Days",
+    "last_30_days": "Last 30 Days",
+    "last_90_days": "Last 90 Days"
+  },
+  "table": {
+    "transaction_id": "Transaction ID",
+    "route": "Origin & Destination",
+    "amount": "Amount",
+    "security_status": "Security Status",
+    "settlement": "Settlement",
+    "no_transactions": "No Transactions",
+    "no_transactions_desc": "Transactions will appear here once your shipments are matched and booked.",
+    "processing": "Processing...",
+    "settle_now": "Settle Now"
+  },
+  "actions": {
+    "statement": "Get Statement"
+  },
+  "toast": {
+    "statement_downloading": "Generating financial statement...",
+    "success": "Payment processed successfully!",
+    "failed": "Payment failed"
+  }
+}

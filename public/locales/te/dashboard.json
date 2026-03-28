@@ -1,0 +1,12 @@
+{
+  "welcome": "స్వాగతం",
+  "stats": { 
+    "totalRevenue": "మొత్తం ఆదాయం", 
+    "activeShipments": "యాక్టివ్ షిప్‌మెంట్‌లు", 
+    "pendingSettlements": "పెండింగ్ సెటిల్‌మెంట్‌లు", 
+    "co2Saved": "CO₂ ఆదా చేయబడింది",
+    "pendingMatches": "పెండింగ్ మ్యాచ్‌లు",
+    "walletBalance": "వాలెట్ బ్యాలెన్స్"
+  },
+  "create_cta": "షిప్‌మెంట్ బుక్ చేయండి"
+}

@@ -1,0 +1,36 @@
+{
+  "app_name": "LoadLink",
+  "loading_secure_connection": "Securing Connection...",
+  "status": {
+    "requested": "Requested",
+    "matched": "Matched",
+    "in_progress": "In Progress",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "paid": "Paid",
+    "pending": "Pending",
+    "failed": "Failed"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "shipments": "Shipments",
+    "tracking": "Tracking",
+    "messages": "Messages",
+    "maps": "Maps",
+    "book_shipment": "Book Shipment",
+    "payments": "Payments",
+    "analytics": "Analytics",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "account": {
+    "partner": "Partner",
+    "type_suffix": "Account",
+    "sign_out": "Sign Out"
+  },
+  "roles": {
+    "driver": "Driver",
+    "msme": "Business",
+    "admin": "Admin"
+  }
+}

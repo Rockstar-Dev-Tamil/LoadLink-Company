@@ -1,0 +1,12 @@
+{
+  "welcome": "ಸ್ವಾಗತ",
+  "stats": { 
+    "totalRevenue": "ಒಟ್ಟು ಆದಾಯ", 
+    "activeShipments": "ಸಕ್ರಿಯ ಶಿಪ್‌ಮೆಂಟ್‌ಗಳು", 
+    "pendingSettlements": "ಬಾಕಿ ಇರುವ ವಸಾಹತುಗಳು", 
+    "co2Saved": "CO₂ ಉಳಿಸಲಾಗಿದೆ",
+    "pendingMatches": "ಬಾಕಿ ಇರುವ ಪಂದ್ಯಗಳು",
+    "walletBalance": "ವ್ಯಾಲೆಟ್ ಬ್ಯಾಲೆನ್ಸ್"
+  },
+  "create_cta": "ಶಿಪ್‌ಮೆಂಟ್ ಬುಕ್ ಮಾಡಿ"
+}
