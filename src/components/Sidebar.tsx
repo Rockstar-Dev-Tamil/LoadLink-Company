@@ -33,7 +33,7 @@ export function Sidebar() {
     <aside className="w-[var(--sidebar-width)] min-w-[var(--sidebar-width)] bg-[var(--sidebar)] border-r border-[var(--border)] flex flex-col p-[40px_24px] gap-[40px] relative overflow-y-auto backdrop-blur-[40px] saturate-[180%] h-screen sticky top-0 z-50">
       <div className="flex flex-col gap-2 group cursor-default">
         <div className="brand-mark text-[32px] font-black tracking-[-0.06em] uppercase leading-[0.85] text-[var(--text)]">
-          LOAD<span className="text-[var(--accent)] italic">LINK</span>
+          LOADLINK<span className="text-[var(--accent)]">.</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
