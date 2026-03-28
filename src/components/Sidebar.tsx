@@ -38,7 +38,7 @@ export function Sidebar() {
         <div className="flex items-center gap-2">
           <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
           <div className="text-[9px] font-black uppercase tracking-[0.2em] text-[var(--muted)] opacity-80">
-            {t('common:brand.caption', 'Logistics Ecosystem')}
+            {t('common:brand.caption', 'MSME PORTAL')}
           </div>
         </div>
       </div>
