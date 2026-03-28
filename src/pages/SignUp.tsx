@@ -82,20 +82,26 @@ export default function SignUp() {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.05
+        staggerChildren: 0.08,
+        delayChildren: 0.5
       }
     }
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 10 },
-    visible: { opacity: 1, y: 0 }
+    hidden: { opacity: 0, y: 15, scale: 0.98 },
+    visible: { 
+      opacity: 1, 
+      y: 0, 
+      scale: 1,
+      transition: { duration: 0.4, ease: "circOut" }
+    }
   };
 
   return (
     <AuthLayout 
-      title="Create your account" 
-      subtitle="Start shipping smarter"
+      title="Create Account" 
+      subtitle="Join the next generation of logistics"
     >
       <motion.form 
         variants={containerVariants}
@@ -107,7 +113,7 @@ export default function SignUp() {
         <motion.div variants={itemVariants}>
           <InputField
             label="FULL NAME"
-            icon={<LucideUser size={18} />}
+            icon={<LucideUser size={20} />}
             placeholder="John Doe"
             registration={register('name')}
             error={errors.name?.message}
@@ -117,7 +123,7 @@ export default function SignUp() {
         <motion.div variants={itemVariants}>
           <InputField
             label="EMAIL ADDRESS"
-            icon={<LucideMail size={18} />}
+            icon={<LucideMail size={20} />}
             placeholder="johndoe@company.com"
             registration={register('email')}
             error={errors.email?.message}
@@ -126,9 +132,9 @@ export default function SignUp() {
 
         <motion.div variants={itemVariants} className="space-y-4">
           <InputField
-            label="PASSWORD"
+            label="NETWORK PASSWORD"
             type={showPassword ? 'text' : 'password'}
-            icon={<LucideLock size={18} />}
+            icon={<LucideLock size={20} />}
             placeholder="••••••••"
             registration={register('password')}
             error={errors.password?.message}
@@ -136,32 +142,39 @@ export default function SignUp() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="text-[var(--muted)] hover:text-[var(--accent)] transition-colors mr-1"
+                className="text-[var(--muted)] hover:text-[var(--accent)] transition-all transform hover:scale-110 px-2"
               >
-                {showPassword ? <LucideEyeOff size={18} /> : <LucideEye size={18} />}
+                {showPassword ? <LucideEyeOff size={20} /> : <LucideEye size={20} />}
               </button>
             }
           />
 
           {/* Password Strength Meter */}
-          <div className="px-1">
+          <div className="px-2">
             <div className="flex justify-between items-center mb-3">
-              <span className="text-[9px] font-black tracking-[0.2em] text-[var(--muted)] uppercase">Security Strength</span>
-              <span className={`text-[9px] font-black uppercase tracking-widest ${strength > 0 ? 'text-[var(--accent)]' : 'text-[var(--muted)]'}`}>
-                {STRENGTH_CONFIG[strength].label}
-              </span>
+              <span className="text-[9px] font-black tracking-[0.3em] text-[var(--muted)] uppercase opacity-60">Security Clearance</span>
+              <motion.span 
+                key={strength}
+                initial={{ opacity: 0, x: 5 }}
+                animate={{ opacity: 1, x: 0 }}
+                className={`text-[9px] font-black uppercase tracking-widest ${strength > 0 ? 'text-[var(--accent)]' : 'text-[var(--muted)]'}`}
+              >
+                {STRENGTH_CONFIG[strength].label || 'Scanning...'}
+              </motion.span>
             </div>
-            <div className="flex gap-2 h-1.5">
+            <div className="flex gap-2.5 h-1.5">
               {[1, 2, 3, 4].map((bar) => (
                 <div 
                   key={bar}
-                  className={`flex-1 rounded-full transition-all duration-500 bg-[var(--surface-soft)] overflow-hidden border border-[var(--border)]`}
+                  className={`flex-1 rounded-full transition-all duration-500 bg-white/[0.03] overflow-hidden border border-white/5`}
                 >
                   <motion.div 
                     initial={false}
-                    animate={{ width: bar <= strength ? '100%' : '0%' }}
-                    className={`h-full ${STRENGTH_CONFIG[strength].color.replace('bg-', 'bg-')}`}
-                    style={{ backgroundColor: bar <= strength ? undefined : 'transparent' }}
+                    animate={{ 
+                      width: bar <= strength ? '100%' : '0%',
+                      backgroundColor: bar <= strength ? (STRENGTH_CONFIG[strength].color.includes('rose') ? '#f43f5e' : STRENGTH_CONFIG[strength].color.includes('amber') ? '#f59e0b' : STRENGTH_CONFIG[strength].color.includes('sky') ? '#0ea5e9' : '#10b981') : 'transparent'
+                    }}
+                    className={`h-full shadow-[0_0_10px_rgba(0,0,0,0.5)]`}
                   />
                 </div>
               ))}
@@ -173,7 +186,7 @@ export default function SignUp() {
           <InputField
             label="CONFIRM PASSWORD"
             type={showConfirm ? 'text' : 'password'}
-            icon={<LucideCheckCircle size={18} />}
+            icon={<LucideCheckCircle size={20} />}
             placeholder="••••••••"
             registration={register('confirm')}
             error={errors.confirm?.message}
@@ -181,9 +194,9 @@ export default function SignUp() {
               <button
                 type="button"
                 onClick={() => setShowConfirm(!showConfirm)}
-                className="text-[var(--muted)] hover:text-[var(--accent)] transition-colors mr-1"
+                className="text-[var(--muted)] hover:text-[var(--accent)] transition-all transform hover:scale-110 px-2"
               >
-                {showConfirm ? <LucideEyeOff size={18} /> : <LucideEye size={18} />}
+                {showConfirm ? <LucideEyeOff size={20} /> : <LucideEye size={20} />}
               </button>
             }
           />
@@ -192,44 +205,47 @@ export default function SignUp() {
         <motion.div variants={itemVariants}>
           <InputField
             label="HOME CITY (OPTIONAL)"
-            icon={<LucideMapPin size={18} />}
+            icon={<LucideMapPin size={20} />}
             placeholder="e.g. Chennai, Mumbai"
             registration={register('home_city')}
             error={errors.home_city?.message}
           />
         </motion.div>
 
-        <motion.div variants={itemVariants} className="pt-4">
+        <motion.div variants={itemVariants} className="pt-6">
           <button
             type="submit"
             disabled={isSubmitting}
-            className="primary-button w-full h-16 text-[10px] tracking-[0.2em] font-black uppercase shadow-2xl shadow-[var(--accent)]/30 active:scale-[0.98]"
+            className="primary-button group w-full h-[72px] rounded-[1.5rem] relative overflow-hidden transition-all duration-500 active:scale-[0.97]"
           >
+             {/* Animated Button Shine */}
+             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+             
             {isSubmitting ? (
-              <>
-                <LucideLoader2 size={20} className="animate-spin" />
-                <span>CREATING ACCOUNT...</span>
-              </>
+              <div className="flex items-center gap-3">
+                <LucideLoader2 size={24} className="animate-spin text-white/80" />
+                <span className="text-[11px] tracking-[0.3em] font-black uppercase">INITIALIZING...</span>
+              </div>
             ) : (
-              <>
-                <span>CREATE ACCOUNT</span>
-                <LucideArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-              </>
+              <div className="flex items-center justify-center gap-3 w-full">
+                <span className="text-[11px] tracking-[0.3em] font-black uppercase">CREATE SYSTEM ACCOUNT</span>
+                <LucideArrowRight size={20} className="group-hover:translate-x-1.5 transition-transform duration-300" />
+              </div>
             )}
           </button>
         </motion.div>
 
-        <motion.div variants={itemVariants} className="text-center pt-2">
-          <p className="text-[11px] text-[var(--muted)] font-bold mb-4 tracking-tight leading-relaxed">
-            BY CREATING AN ACCOUNT, YOU AGREE TO OUR <span className="underline cursor-pointer text-[var(--text)]">TERMS OF SERVICE</span>
+        <motion.div variants={itemVariants} className="text-center pt-4">
+          <p className="text-[11px] text-[var(--muted)] font-bold mb-6 tracking-tight leading-relaxed opacity-60">
+            BY CREATING AN ACCOUNT, YOU AGREE TO OUR <span className="underline cursor-pointer text-white hover:text-[var(--accent)] transition-colors">POLICIES</span>
           </p>
-          <p className="text-[var(--muted)] text-[12px] font-bold tracking-tight">
-            ALREADY HAVE AN ACCOUNT?{' '}
+          <p className="text-[var(--muted)] text-[13px] font-bold tracking-tight">
+            ALREADY PART OF FLEET?{' '}
             <Link 
               to="/login" 
-              className="text-[var(--accent)] hover:text-[var(--accent-bright)] font-black transition-colors ml-1"
+              className="text-white hover:text-[var(--accent)] font-black transition-all duration-300 ml-2 border-b-2 border-[var(--accent)]/30 hover:border-[var(--accent)]"
             >
-              SIGN IN →
+              SIGN IN HERE →
             </Link>
           </p>
         </motion.div>

@@ -46,43 +46,49 @@ export default function Login() {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.08
+        staggerChildren: 0.1,
+        delayChildren: 0.4
       }
     }
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 10 },
-    visible: { opacity: 1, y: 0 }
+    hidden: { opacity: 0, y: 20, scale: 0.98 },
+    visible: { 
+      opacity: 1, 
+      y: 0, 
+      scale: 1,
+      transition: { duration: 0.5, ease: "circOut" }
+    }
   };
 
   return (
     <AuthLayout 
-      title="Welcome back" 
-      subtitle="Sign in to your dashboard"
+      title="Access Dashboard" 
+      subtitle="Enter your credentials to continue"
     >
       <motion.form 
         variants={containerVariants}
         initial="hidden"
         animate="visible"
         onSubmit={handleSubmit(onSubmit)} 
-        className="space-y-8"
+        className="space-y-10"
       >
         <motion.div variants={itemVariants}>
           <InputField
             label="EMAIL ADDRESS"
-            icon={<LucideMail size={18} />}
+            icon={<LucideMail size={20} />}
             placeholder="name@company.com"
             registration={register('email')}
             error={errors.email?.message}
           />
         </motion.div>
-...
+
         <motion.div variants={itemVariants}>
           <InputField
             label="PASSWORD"
             type={showPassword ? 'text' : 'password'}
-            icon={<LucideLock size={18} />}
+            icon={<LucideLock size={20} />}
             placeholder="••••••••"
             registration={register('password')}
             error={errors.password?.message}
@@ -90,42 +96,50 @@ export default function Login() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="text-[var(--muted)] hover:text-[var(--accent)] transition-colors mr-1"
+                className="text-[var(--muted)] hover:text-[var(--accent)] transition-all duration-300 transform hover:scale-110 px-2"
               >
-                {showPassword ? <LucideEyeOff size={18} /> : <LucideEye size={18} />}
+                {showPassword ? <LucideEyeOff size={20} /> : <LucideEye size={20} />}
               </button>
             }
           />
+          <div className="flex justify-end mt-3">
+            <Link to="/forgot-password" title="Forgot Password?" className="text-[10px] font-black text-[var(--muted)] hover:text-[var(--accent)] uppercase tracking-widest transition-colors">
+              Recovery Access?
+            </Link>
+          </div>
         </motion.div>
 
-        <motion.div variants={itemVariants} className="pt-4">
+        <motion.div variants={itemVariants} className="pt-6">
           <button
             type="submit"
             disabled={isSubmitting}
-            className="primary-button w-full h-16 text-[10px] tracking-[0.2em] font-black uppercase shadow-2xl shadow-[var(--accent)]/30 active:scale-[0.98]"
+            className="primary-button group w-full h-[72px] rounded-[1.5rem] relative overflow-hidden transition-all duration-500 active:scale-[0.97]"
           >
+             {/* Animated Button Shine */}
+             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+             
             {isSubmitting ? (
-              <>
-                <LucideLoader2 size={20} className="animate-spin" />
-                <span>SIGNING IN...</span>
-              </>
+              <div className="flex items-center gap-3">
+                <LucideLoader2 size={24} className="animate-spin text-white/80" />
+                <span className="text-[11px] tracking-[0.3em] font-black uppercase">AUTHENTICATING...</span>
+              </div>
             ) : (
-              <>
-                <span>SIGN IN</span>
-                <LucideArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-              </>
+              <div className="flex items-center justify-center gap-3 w-full">
+                <span className="text-[11px] tracking-[0.3em] font-black uppercase">SIGN IN TO SYSTEM</span>
+                <LucideArrowRight size={20} className="group-hover:translate-x-1.5 transition-transform duration-300" />
+              </div>
             )}
           </button>
         </motion.div>
 
-        <motion.div variants={itemVariants} className="text-center pt-2">
-          <p className="text-[var(--muted)] text-[12px] font-bold tracking-tight">
-            NEW TO LOADLINK?{' '}
+        <motion.div variants={itemVariants} className="text-center pt-4">
+          <p className="text-[var(--muted)] text-[13px] font-bold tracking-tight">
+            NOT REGISTERED YET?{' '}
             <Link 
               to="/signup" 
-              className="text-[var(--accent)] hover:text-[var(--accent-bright)] font-black transition-colors ml-1"
+              className="text-white hover:text-[var(--accent)] font-black transition-all duration-300 ml-2 border-b-2 border-[var(--accent)]/30 hover:border-[var(--accent)]"
             >
-              CREATE ACCOUNT →
+              INITIALIZE ACCOUNT →
             </Link>
           </p>
         </motion.div>
