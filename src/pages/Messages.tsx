@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { LucideArrowRight, LucideMessageSquare, LucidePackage, LucideSend, LucideUserRound, LucideCheckCheck } from 'lucide-react';
 import { toast } from 'sonner';
@@ -22,6 +23,8 @@ type ConversationSummary = {
 };
 
 export default function Messages() {
+  const [searchParams] = useSearchParams();
+  const urlShipmentId = searchParams.get('shipmentId');
   const { profile } = useAuthStore();
   const { shipments, loading: shipmentsLoading } = useShipments();
   const [conversationMessages, setConversationMessages] = useState<Message[]>([]);
@@ -45,12 +48,16 @@ export default function Messages() {
     }
 
     setSelectedShipmentId((current) => {
+      // Prioritize shipmentId from URL if present
+      if (urlShipmentId && shipments.some(s => s.id === urlShipmentId)) {
+        return urlShipmentId;
+      }
       if (current && shipments.some((shipment) => shipment.id === current)) {
         return current;
       }
       return shipments[0]?.id ?? null;
     });
-  }, [shipments]);
+  }, [shipments, urlShipmentId]);
 
   useEffect(() => {
     if (!profile?.id) {

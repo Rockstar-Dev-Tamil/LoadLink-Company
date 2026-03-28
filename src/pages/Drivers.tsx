@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useDrivers } from '../hooks/useDrivers';
 import { Topbar } from '../components/Topbar';
 import { Skeleton } from '../components/Skeleton';
@@ -13,8 +14,10 @@ import {
   LucideMessageCircle
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { toast } from 'sonner';
 
 export default function Drivers() {
+  const navigate = useNavigate();
   const { drivers, loading } = useDrivers();
 
   const driverStats = useMemo(() => {
@@ -108,7 +111,17 @@ export default function Drivers() {
                       <LucideClock size={12} />
                       <span className="text-[10px] font-black uppercase tracking-widest">Last: {lastSeen}</span>
                     </div>
-                    <button className="p-2 rounded-lg hover:bg-white/5 text-[var(--accent)] transition-colors">
+                    <button 
+                      onClick={() => {
+                        const activeBooking = driver.bookings?.find(b => b.status === 'in_progress' || b.status === 'requested');
+                        if (activeBooking?.shipment_id) {
+                          navigate(`/messages?shipmentId=${activeBooking.shipment_id}`);
+                        } else {
+                          toast.info(`No active shipment found for ${driver.name}.`);
+                        }
+                      }}
+                      className="p-2 rounded-lg hover:bg-white/5 text-[var(--accent)] transition-colors"
+                    >
                       <LucideMessageCircle size={18} />
                     </button>
                   </div>

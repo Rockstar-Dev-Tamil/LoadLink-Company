@@ -17,6 +17,11 @@ export type DriverProfile = {
     longitude: number;
     updated_at: string;
   } | null;
+  bookings: {
+    id: string;
+    shipment_id: string;
+    status: string;
+  }[];
 };
 
 export function useDrivers() {
@@ -30,7 +35,8 @@ export function useDrivers() {
         .select(`
           id, name, email, home_city,
           trucks!trucks_driver_id_fkey(vehicle_number, vehicle_type, ulip_verified),
-          user_locations(latitude, longitude, updated_at)
+          user_locations(latitude, longitude, updated_at),
+          bookings!bookings_driver_id_fkey(id, shipment_id, status)
         `)
         .eq('role', 'driver');
 
