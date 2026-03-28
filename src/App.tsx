@@ -12,6 +12,7 @@ import { RootError } from './components/RootError';
 // Lazy load pages
 const Login = lazy(() => import('@/pages/Login'));
 const SignUp = lazy(() => import('@/pages/SignUp'));
+const Landing = lazy(() => import('@/pages/Landing'));
 const Dashboard = lazy(() => import('@/pages/Dashboard'));
 const ActiveShipments = lazy(() => import('@/pages/ActiveShipments'));
 const Tracking = lazy(() => import('@/pages/Tracking'));
@@ -42,10 +43,16 @@ export const PAGE_PRELOADERS = {
   simulator: preloadSimulator,
 };
 
-function LandingRedirect() {
+function RootGate() {
   const { user, profile, initialized, loading } = useAuthStore();
   if (!initialized || loading) return <PageLoader />;
-  if (!user) return <Navigate to="/login" replace />;
+  if (!user) {
+    return (
+      <Suspense fallback={<PageLoader />}>
+        <Landing />
+      </Suspense>
+    );
+  }
   if (profile?.role === 'driver') return <Navigate to="/driver" replace />;
   return <Navigate to="/dashboard" replace />;
 }
@@ -53,7 +60,7 @@ function LandingRedirect() {
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <LandingRedirect />,
+    element: <RootGate />,
     errorElement: <RootError />,
   },
   {
@@ -211,7 +218,7 @@ const router = createBrowserRouter([
       },
     ]
   },
-  { path: '*', element: <Navigate to="/login" replace /> }
+  { path: '*', element: <Navigate to="/" replace /> }
 ]);
 
 export default function App() {
