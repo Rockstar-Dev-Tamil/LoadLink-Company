@@ -365,7 +365,7 @@ export default function Tracking() {
                       {t('tracking:intelligence.distance', 'Remaining')}
                     </div>
                     <div className="text-[15px] font-black text-[var(--text)]">
-                      {(routeDetails[selectedShipmentId].distance / 1000).toFixed(1)} km
+                      {((routeDetails[selectedShipmentId].distance || 0) / 1000).toFixed(1)} km
                     </div>
                   </div>
                 </div>
@@ -629,7 +629,7 @@ export default function Tracking() {
                         {live.error
                           ? `Blocked: ${live.error}`
                           : (live.location
-                              ? `Live fix: ${live.location.lat.toFixed(5)}, ${live.location.lng.toFixed(5)}`
+                              ? `Live fix: ${live.location.lat?.toFixed(5) || '0'}, ${live.location.lng?.toFixed(5) || '0'}`
                               : 'No live GPS row yet. Open /driver on the driver phone and press Start.'
                             )}
                       </div>
@@ -721,8 +721,8 @@ export default function Tracking() {
                               <div className="text-[10px] font-black uppercase tracking-widest text-[var(--muted)]">Last fix</div>
                               <div className="mt-1 text-xs font-black text-[var(--text)]">
                                 {live.location
-                                  ? `${live.location.lat.toFixed(5)}, ${live.location.lng.toFixed(5)}`
-                                  : (location ? `${location.lat.toFixed(5)}, ${location.lng.toFixed(5)}` : '--')}
+                                  ? `${live.location.lat?.toFixed(5) || '0'}, ${live.location.lng?.toFixed(5) || '0'}`
+                                  : (location?.coordinates ? `${location.coordinates[1].toFixed(5)}, ${location.coordinates[0].toFixed(5)}` : '--')}
                               </div>
                             </div>
                             <div className="rounded-[18px] border border-[var(--border)] bg-[var(--surface-soft)] px-4 py-3">
