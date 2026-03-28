@@ -27,7 +27,7 @@ export function StatusBadge({ status }: StatusBadgeProps) {
   const styles = BADGE[status] || 'bg-gray-500/15 text-gray-400 border border-gray-500/20';
   
   return (
-    <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${styles}`}>
+    <span className={`inline-flex items-center px-3.5 py-1.5 rounded-full text-[11px] font-semibold uppercase tracking-[0.08em] ${styles}`}>
       {typeof t === 'function' ? t(`common:status.${status}`) : status}
     </span>
   );

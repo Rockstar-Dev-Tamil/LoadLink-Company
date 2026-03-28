@@ -1,8 +1,8 @@
-import { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useMemo, useState } from 'react';
 import { useDrivers } from '../hooks/useDrivers';
 import { Topbar } from '../components/Topbar';
 import { Skeleton } from '../components/Skeleton';
+import { ChatWindow } from '../components/ChatWindow';
 import { 
   LucideUserRound, 
   LucideTruck, 
@@ -17,8 +17,12 @@ import { formatDistanceToNow } from 'date-fns';
 import { toast } from 'sonner';
 
 export default function Drivers() {
-  const navigate = useNavigate();
   const { drivers, loading } = useDrivers();
+  const [chatContext, setChatContext] = useState<{
+    shipmentId: string;
+    driverId: string;
+    driverName: string;
+  } | null>(null);
 
   const driverStats = useMemo(() => {
     const online = drivers.filter(d => d.user_locations && (Date.now() - Date.parse(d.user_locations.updated_at)) < 300000).length;
@@ -115,7 +119,11 @@ export default function Drivers() {
                       onClick={() => {
                         const activeBooking = driver.bookings?.find(b => b.status === 'in_progress' || b.status === 'requested');
                         if (activeBooking?.shipment_id) {
-                          navigate(`/messages?shipmentId=${activeBooking.shipment_id}`);
+                          setChatContext({
+                            shipmentId: activeBooking.shipment_id,
+                            driverId: driver.id,
+                            driverName: driver.name,
+                          });
                         } else {
                           toast.info(`No active shipment found for ${driver.name}.`);
                         }
@@ -131,6 +139,16 @@ export default function Drivers() {
           </div>
         )}
       </div>
+
+      {chatContext ? (
+        <ChatWindow
+          shipmentId={chatContext.shipmentId}
+          driverId={chatContext.driverId}
+          driverName={chatContext.driverName}
+          isOpen={!!chatContext}
+          onClose={() => setChatContext(null)}
+        />
+      ) : null}
     </div>
   );
 }

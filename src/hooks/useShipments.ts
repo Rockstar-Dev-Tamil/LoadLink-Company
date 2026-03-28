@@ -5,7 +5,7 @@ import type { Shipment, Match, Booking } from '@/types/app.types'
 import type { PostgisPoint } from '@/types/database.types'
 
 export function useShipments() {
-  const { user } = useAuthStore()
+  const { user, initialized } = useAuthStore()
   const [shipments, setShipments] = useState<Shipment[]>([])
   const [loading, setLoading]     = useState(true)
   const [error, setError]         = useState<string | null>(null)
@@ -17,7 +17,13 @@ export function useShipments() {
   }, [])
 
   const fetchShipments = useCallback(async () => {
-    if (!user?.id) return
+    if (!initialized) return
+    if (!user?.id) { 
+      setShipments([])
+      setLoading(false)
+      setError(null)
+      return
+    }
     if (!shipments.length) setLoading(true)
     setError(null)
 
@@ -41,6 +47,8 @@ export function useShipments() {
         bookings(
           id, agreed_price, status, driver_id, route_id, created_at,
           current_milestone, loading_proof_url, delivery_proof_url, milestone_history,
+          loading_proof_status, loading_proof_uploaded_at, loading_proof_verified_at, loading_proof_verified_by, loading_proof_review_note,
+          delivery_proof_status, delivery_proof_uploaded_at, delivery_proof_verified_at, delivery_proof_verified_by, delivery_proof_review_note,
           driver:profiles!driver_id(id, name, email),
           payments(id, amount, payment_status, payment_method, created_at),
           biltys(id, consignee_name, weight_kg, total_price, document_url, created_at)
@@ -54,13 +62,13 @@ export function useShipments() {
 
     setShipments((data as unknown as Shipment[]) ?? [])
     setLoading(false)
-  }, [user?.id])
+  }, [initialized, user?.id])
 
   useEffect(() => { fetchShipments() }, [fetchShipments])
 
   // Realtime: shipment row changes
   useEffect(() => {
-    if (!user?.id) return
+    if (!initialized || !user?.id) return
     const ch = supabase
       .channel(`rt_shipments_${user.id}`)
       .on('postgres_changes', {
@@ -86,7 +94,7 @@ export function useShipments() {
 
   // Realtime: matches for my shipments (client-side filter)
   useEffect(() => {
-    if (!user?.id || !shipments.length) return
+    if (!initialized || !user?.id || !shipments.length) return
     const myIds = new Set(shipments.map(s => s.id))
 
     const ch = supabase
@@ -118,7 +126,7 @@ export function useShipments() {
 
   // Realtime: booking updates
   useEffect(() => {
-    if (!user?.id) return
+    if (!initialized || !user?.id) return
     const ch = supabase
       .channel(`rt_bookings_${user.id}`)
       .on('postgres_changes', {

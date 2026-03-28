@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LucideBell, LucideGlobe, LucideLock, LucideMapPin, LucideSave, LucideUser } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -16,6 +16,12 @@ const SECTIONS: Array<{ id: SectionId; labelKey: string; icon: any; kicker: stri
   { id: 'security', labelKey: 'settings:nav.security', icon: LucideLock, kicker: 'SECURE' },
   { id: 'notifications', labelKey: 'settings:nav.notifications', icon: LucideBell, kicker: 'SYNCED' },
 ];
+
+const LANGUAGE_OPTIONS = {
+  en: { label: 'English' },
+  ta: { label: 'Tamil' },
+  hi: { label: 'Hindi' },
+} as const;
 
 export default function Settings() {
   const { t, i18n } = useTranslation(['settings', 'common']);
@@ -38,18 +44,14 @@ export default function Settings() {
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
-  const languageOptions = useMemo(() => ({
-    en: { label: 'English' },
-    ta: { label: 'Tamil' },
-    hi: { label: 'Hindi' },
-  }), []);
+  const languageOptions = LANGUAGE_OPTIONS;
 
-  const changeLanguage = (lng: keyof typeof languageOptions) => {
+  const changeLanguage = (lng: keyof typeof LANGUAGE_OPTIONS) => {
     i18n.changeLanguage(lng);
     toast.success(t('settings:toast.language_changed', { lng: languageOptions[lng].label }));
   };
 
-  const handleUpdateProfile = async (event: React.FormEvent) => {
+  const handleUpdateProfile = async (event: FormEvent) => {
     event.preventDefault();
     if (!profile?.id) return;
 
@@ -210,7 +212,7 @@ export default function Settings() {
               </div>
 
               <div className="flex flex-wrap gap-2">
-                {(Object.keys(languageOptions) as Array<keyof typeof languageOptions>).map((code) => {
+                {(Object.keys(LANGUAGE_OPTIONS) as Array<keyof typeof LANGUAGE_OPTIONS>).map((code) => {
                   const isActive = i18n.language === code;
                   return (
                     <button
@@ -267,4 +269,3 @@ export default function Settings() {
     </div>
   );
 }
-

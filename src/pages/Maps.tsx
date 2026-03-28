@@ -1,163 +1,93 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { LucideMapPin, LucideNavigation } from 'lucide-react';
 import { Topbar } from '../components/Topbar';
-import { Skeleton } from '../components/Skeleton';
-import { LiveTrackingMap, TrackedShipment } from '../components/LiveTrackingMap';
-import { useShipments } from '../hooks/useShipments';
-import { useTracking } from '../hooks/useTracking';
-import { useMatchedVehicles } from '../hooks/useMatchedVehicles';
-import { useUserLocation } from '../hooks/useUserLocation';
+import { useShipments } from '@/hooks/useShipments';
+import { useFleetUserLocations, type FleetUserLocation } from '@/hooks/useFleetUserLocations';
+import { FleetIntelMap } from '@/components/FleetIntelMap';
+import { toast } from 'sonner';
 
+/**
+ * Maps Page: Network-Wide Logistics Demo
+ * Provides a high-fidelity standalone logistics simulation across the network.
+ */
 export default function Maps() {
-  const { t } = useTranslation(['tracking', 'common']);
-  const { shipments, loading } = useShipments();
-  const [selectedShipmentId, setSelectedShipmentId] = useState<string | null>(null);
-  const [routeDetails, setRouteDetails] = useState<Record<string, any>>({});
+  useTranslation(['tracking', 'common']);
+  const { shipments, error } = useShipments();
 
-  const trackableShipments = useMemo(() => {
-    return shipments.filter((shipment) => ['requested', 'matched', 'in_progress'].includes(shipment.status));
+  const driverIds = useMemo(() => {
+    return shipments
+      .map((s) => s.bookings?.[0]?.driver_id)
+      .filter((v): v is string => !!v);
   }, [shipments]);
 
-  const activeShipment = useMemo(() => {
-    if (selectedShipmentId) {
-      return trackableShipments.find((shipment) => shipment.id === selectedShipmentId) || trackableShipments[0];
-    }
-    return trackableShipments[0];
-  }, [trackableShipments, selectedShipmentId]);
+  const live = useFleetUserLocations(driverIds);
 
-  const activeBooking = activeShipment?.bookings?.[0];
-  const live = useUserLocation(activeBooking?.driver_id ?? null);
-  const { location } = useTracking(activeBooking?.id);
-  const { vehicles: matchedVehicles } = useMatchedVehicles(activeShipment?.id || null);
+  const liveByDriverId = useMemo(() => {
+    const out: Record<string, { lat: number; lng: number; updated_at: string }> = {};
+    Object.values(live.rows as Record<string, FleetUserLocation>).forEach((r) => {
+      out[r.device_id] = { lat: r.latitude, lng: r.longitude, updated_at: r.updated_at };
+    });
+    return out;
+  }, [live.rows]);
 
-  const candidates = useMemo(() => {
-    return matchedVehicles
-      .filter((vehicle) => vehicle.location)
-      .map((vehicle) => ({
-        id: vehicle.truckId,
-        location: vehicle.location!,
-        label: vehicle.registrationNumber || 'Candidate',
-      }));
-  }, [matchedVehicles]);
-
-  const mappedShipments: TrackedShipment[] = useMemo(() => {
-    return trackableShipments
-      .filter((shipment) => shipment.pickup_location?.coordinates && shipment.drop_location?.coordinates)
-      .map((shipment) => {
-        const originCoord = shipment.pickup_location!.coordinates;
-        const destCoord = shipment.drop_location!.coordinates;
-
-        let truckLoc;
-        if (shipment.id === activeShipment?.id && live.location) {
-          truckLoc = { lat: live.location.lat, lng: live.location.lng };
-        } else if (shipment.id === activeShipment?.id && location?.coordinates) {
-          truckLoc = { lat: location.coordinates[1], lng: location.coordinates[0] };
-        }
-
+  const mapShipments = useMemo(() => {
+    return shipments
+      .filter((s) => s.pickup_location?.coordinates && s.drop_location?.coordinates)
+      .slice(0, 30)
+      .map((s) => {
+        const o = s.pickup_location!.coordinates;
+        const d = s.drop_location!.coordinates;
         return {
-          id: shipment.id,
-          origin: { lat: originCoord[1], lng: originCoord[0] },
-          destination: { lat: destCoord[1], lng: destCoord[0] },
-          truckLocation: truckLoc,
-          status: shipment.status,
+          id: s.id,
+          origin: { lat: o[1], lng: o[0] },
+          destination: { lat: d[1], lng: d[0] },
+          driverId: s.bookings?.[0]?.driver_id ?? null,
         };
       });
-  }, [trackableShipments, activeShipment?.id, live.location, location]);
+  }, [shipments]);
 
-  if (loading) {
-    return (
-      <div className="flex flex-col h-full overflow-hidden">
-        <Topbar title="Maps" />
-        <div className="page-scroll">
-          <Skeleton className="h-[70vh] w-full rounded-[32px]" />
-        </div>
-      </div>
-    );
-  }
+  const lastErrorRef = useRef<string>('');
+  useEffect(() => {
+    if (!error) return;
+    if (lastErrorRef.current === error) return;
+    lastErrorRef.current = error;
+    toast.error(error);
+  }, [error]);
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
-      <Topbar title="Maps" subtitle="OSRM routing overlays for your live shipments" />
-
-      <div className="page-scroll pb-24">
-        <div className="card hero-card mb-6">
-          <div className="hero-copy">
-            <div className="section-label">MAPS</div>
-            <h1 className="hero-title">OSRM-powered route intelligence for every active lane.</h1>
-            <p className="hero-description">
-              This view uses the OSRM routing layer in your map component and updates as shipments and tracking coordinates change in Supabase.
-            </p>
-          </div>
-        </div>
-
-        <div className="relative overflow-hidden rounded-[32px] border border-[var(--border)] bg-[var(--surface-strong)] shadow-2xl h-[70vh] min-h-[520px]">
-          <LiveTrackingMap
-            shipments={mappedShipments}
-            onSelectShipment={setSelectedShipmentId}
-            onRouteDataUpdate={(id, data) => setRouteDetails((prev) => ({ ...prev, [id]: data }))}
-            candidates={candidates}
-            activeShipmentId={activeShipment?.id ?? null}
-          />
-
-          {activeShipment && routeDetails[activeShipment.id] && (
-            <div className="absolute bottom-6 left-6 right-6 p-1 bg-[var(--surface-strong)] border border-[var(--border-strong)] rounded-[22px] backdrop-blur-xl z-10 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
-              <div className="flex items-center justify-between px-6 py-4">
-                <div className="flex items-center gap-5">
-                  <div className="w-11 h-11 rounded-[14px] bg-[var(--accent)] flex items-center justify-center text-white">
-                    <LucideNavigation size={22} className="rotate-45" />
-                  </div>
-                  <div>
-                    <div className="text-[10px] font-black text-[var(--muted)] uppercase tracking-widest">
-                      {t('tracking:intelligence.eta', 'Est. Intersection')}
-                    </div>
-                    <div className="text-[15px] font-black text-[var(--text)]">
-                      {Math.round(routeDetails[activeShipment.id].duration / 60)} {t('tracking:intelligence.min', 'min')}
-                    </div>
-                  </div>
-                </div>
-                <div className="h-10 w-px bg-[var(--border)]" />
-                <div className="flex flex-col items-end">
-                  <div className="text-[10px] font-black text-[var(--muted)] uppercase tracking-widest">
-                    {t('tracking:intelligence.distance', 'Remaining')}
-                  </div>
-                  <div className="text-[15px] font-black text-[var(--text)]">
-                    {(routeDetails[activeShipment.id].distance / 1000).toFixed(1)} km
-                  </div>
-                </div>
+    <div className="flex flex-col h-full overflow-hidden bg-[var(--surface)]">
+      <Topbar 
+        title="FLEET INTELLIGENCE" 
+        subtitle="Network live: shipments, terminals, and driver devices." 
+      />
+      
+      <main className="flex-1 p-2 sm:p-6 lg:p-8 flex flex-col min-h-0">
+        <div className="flex-1 relative rounded-3xl sm:rounded-[40px] overflow-hidden border border-[var(--border-strong)] shadow-[0_32px_64px_rgba(0,0,0,0.4)] bg-[var(--surface-strong)]">
+          <FleetIntelMap shipments={mapShipments} liveByDriverId={liveByDriverId} />
+          
+          {/* Simulation Status Overlay */}
+          <div className="absolute top-4 sm:top-8 left-4 sm:left-8 z-10 pointer-events-none">
+            <div className="glass-panel !py-3 sm:!py-4 !px-4 sm:!px-6 flex items-center gap-3 sm:gap-4 backdrop-blur-3xl border border-white/10 shadow-2xl rounded-xl sm:rounded-2xl">
+              <div className="relative">
+                <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-emerald-500 animate-pulse" />
+                <div className="absolute inset-0 w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-emerald-500/50 animate-ping" />
               </div>
-              <div className="h-1 rounded-full bg-white/5 mx-6 mb-1 overflow-hidden">
-                <div className="h-full bg-[var(--accent)] w-2/3" />
+              <div>
+                <div className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] text-white/50 mb-0.5"> System Status </div>
+                <div className="text-xs sm:text-sm font-black text-white uppercase tracking-wider"> Network Live </div>
               </div>
-            </div>
-          )}
-
-        </div>
-
-        {activeShipment && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-6">
-            <div className="message-card">
-              <div className="section-label">ACTIVE LANE</div>
-              <div className="mt-3 text-lg font-black">{activeShipment.pickup_address.split(',')[0]}</div>
-              <div className="muted">{activeShipment.drop_address.split(',')[0]}</div>
-            </div>
-            <div className="message-card">
-              <div className="section-label">STATUS</div>
-              <div className="mt-3 text-lg font-black uppercase">{activeShipment.status}</div>
-              <div className="muted">OSRM route refreshed in realtime.</div>
-            </div>
-            <div className="message-card">
-              <div className="section-label">COORDINATES</div>
-              <div className="mt-3 text-sm font-black flex items-center gap-2">
-                <LucideMapPin size={14} />
-                {activeShipment.pickup_location?.coordinates?.[1]?.toFixed(4) ?? '--'},
-                {activeShipment.pickup_location?.coordinates?.[0]?.toFixed(4) ?? '--'}
-              </div>
-              <div className="muted">Origin node</div>
             </div>
           </div>
-        )}
-      </div>
+
+          {/* Map Overlay Badge */}
+          <div className="absolute top-4 sm:top-8 right-4 sm:right-8 z-10 hidden sm:block">
+            <div className="glass-panel !py-3 !px-5 backdrop-blur-xl border border-white/10 shadow-xl rounded-xl">
+              <div className="text-[10px] font-black text-white/40 uppercase tracking-widest mb-1 text-right">Coordinate System</div>
+              <div className="text-xs font-mono text-white/90">WGS84 | EPSG:4326</div>
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
   );
 }

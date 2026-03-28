@@ -25,7 +25,8 @@ type ConversationSummary = {
 export default function Messages() {
   const [searchParams] = useSearchParams();
   const urlShipmentId = searchParams.get('shipmentId');
-  const { profile } = useAuthStore();
+  const { profile, user } = useAuthStore();
+  const meId = user?.id ?? null;
   const { shipments, loading: shipmentsLoading } = useShipments();
   const [conversationMessages, setConversationMessages] = useState<Message[]>([]);
   const [messagesLoading, setMessagesLoading] = useState(true);
@@ -60,7 +61,7 @@ export default function Messages() {
   }, [shipments, urlShipmentId]);
 
   useEffect(() => {
-    if (!profile?.id) {
+    if (!meId) {
       setConversationMessages([]);
       setMessagesLoading(false);
       return;
@@ -73,7 +74,7 @@ export default function Messages() {
       const { data, error } = await supabase
         .from('messages')
         .select('*')
-        .or(`sender_id.eq.${profile.id},receiver_id.eq.${profile.id}`)
+        .or(`sender_id.eq.${meId},receiver_id.eq.${meId}`)
         .order('created_at', { ascending: true });
 
       if (error) {
@@ -94,14 +95,14 @@ export default function Messages() {
     void fetchConversationMessages();
 
     const channel = supabase
-      .channel(`messages:overview:${profile.id}`)
+      .channel(`messages:overview:${meId}`)
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'messages' },
         (payload) => {
           const nextRow = (payload.new ?? payload.old) as Partial<Message>;
           if (!nextRow.shipment_id) return;
-          const isRelevant = nextRow.sender_id === profile.id || nextRow.receiver_id === profile.id;
+          const isRelevant = nextRow.sender_id === meId || nextRow.receiver_id === meId;
           if (!isRelevant) return;
 
           setConversationMessages((current) => {
@@ -127,7 +128,7 @@ export default function Messages() {
       active = false;
       void supabase.removeChannel(channel);
     };
-  }, [profile?.id]);
+  }, [meId]);
 
   const conversations = useMemo<ConversationSummary[]>(() => {
     const shipmentSet = new Set(shipments.map((shipment) => shipment.id));
@@ -137,7 +138,7 @@ export default function Messages() {
         const thread = conversationMessages.filter((message) => message.shipment_id === shipment.id && shipmentSet.has(shipment.id));
         const sortedThread = [...thread].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
         const lastMessage = sortedThread[0] ?? null;
-        const unreadCount = thread.filter((message) => message.receiver_id === profile?.id && !message.is_read).length;
+        const unreadCount = meId ? thread.filter((message) => message.receiver_id === meId && !message.is_read).length : 0;
 
         return {
           shipmentId: shipment.id,
@@ -154,19 +155,19 @@ export default function Messages() {
         const bTime = b.lastMessage ? new Date(b.lastMessage.created_at).getTime() : 0;
         return bTime - aTime;
       });
-  }, [conversationMessages, profile?.id, shipments]);
+  }, [conversationMessages, meId, shipments]);
 
   const selectedConversation = conversations.find((conversation) => conversation.shipmentId === selectedShipmentId) ?? conversations[0] ?? null;
 
   const receiverId = useMemo(() => {
-    if (!selectedShipmentId || !profile?.id) return null;
+    if (!selectedShipmentId || !meId) return null;
     const shipment = shipments.find((s) => s.id === selectedShipmentId);
     if (!shipment) return null;
 
     const driverId = shipment.bookings?.[0]?.driver_id ?? null;
     const businessId = shipment.business_id;
-    return profile.id === businessId ? driverId : businessId;
-  }, [profile?.id, selectedShipmentId, shipments]);
+    return meId === businessId ? driverId : businessId;
+  }, [meId, selectedShipmentId, shipments]);
 
   const handleSend = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -310,7 +311,7 @@ export default function Messages() {
                         <div ref={streamRef} className="flex-1 overflow-y-auto no-scrollbar pr-2">
                           <div className="stack">
                             {messages.map((message) => {
-                              const isMe = message.sender_id === profile?.id;
+                              const isMe = !!meId && message.sender_id === meId;
                               const bubbleBase = isMe
                                 ? 'ml-auto bg-[var(--accent)] text-white'
                                 : 'mr-auto bg-[var(--surface-strong)] text-[var(--text)]';

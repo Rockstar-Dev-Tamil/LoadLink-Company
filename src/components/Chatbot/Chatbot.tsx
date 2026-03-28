@@ -38,8 +38,10 @@ export function Chatbot() {
   ]);
 
   useEffect(() => {
+    if (!open) return;
+    // Avoid noisy localhost connection errors until the assistant is explicitly opened.
     checkOllama().then(setAiStatus);
-  }, []);
+  }, [open]);
 
   useEffect(() => {
     if (scrollRef.current) {

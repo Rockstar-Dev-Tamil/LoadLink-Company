@@ -192,6 +192,20 @@ export type Database = {
           agreed_price: number
           status: string | null
           created_at: string
+          current_milestone: string | null
+          loading_proof_url: string | null
+          delivery_proof_url: string | null
+          milestone_history: Json | null
+          loading_proof_status: string | null
+          loading_proof_uploaded_at: string | null
+          loading_proof_verified_at: string | null
+          loading_proof_verified_by: string | null
+          loading_proof_review_note: string | null
+          delivery_proof_status: string | null
+          delivery_proof_uploaded_at: string | null
+          delivery_proof_verified_at: string | null
+          delivery_proof_verified_by: string | null
+          delivery_proof_review_note: string | null
         }
         Insert: {
           id?: string
@@ -202,6 +216,20 @@ export type Database = {
           agreed_price: number
           status?: string | null
           created_at?: string
+          current_milestone?: string | null
+          loading_proof_url?: string | null
+          delivery_proof_url?: string | null
+          milestone_history?: Json | null
+          loading_proof_status?: string | null
+          loading_proof_uploaded_at?: string | null
+          loading_proof_verified_at?: string | null
+          loading_proof_verified_by?: string | null
+          loading_proof_review_note?: string | null
+          delivery_proof_status?: string | null
+          delivery_proof_uploaded_at?: string | null
+          delivery_proof_verified_at?: string | null
+          delivery_proof_verified_by?: string | null
+          delivery_proof_review_note?: string | null
         }
         Update: {
           id?: string
@@ -212,6 +240,20 @@ export type Database = {
           agreed_price?: number
           status?: string | null
           created_at?: string
+          current_milestone?: string | null
+          loading_proof_url?: string | null
+          delivery_proof_url?: string | null
+          milestone_history?: Json | null
+          loading_proof_status?: string | null
+          loading_proof_uploaded_at?: string | null
+          loading_proof_verified_at?: string | null
+          loading_proof_verified_by?: string | null
+          loading_proof_review_note?: string | null
+          delivery_proof_status?: string | null
+          delivery_proof_uploaded_at?: string | null
+          delivery_proof_verified_at?: string | null
+          delivery_proof_verified_by?: string | null
+          delivery_proof_review_note?: string | null
         }
         Relationships: [
           {

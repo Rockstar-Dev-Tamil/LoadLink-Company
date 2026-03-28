@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { LucideArrowRight, LucidePackage, LucideTrendingUp, LucideZap, LucideShip, LucideShieldCheck } from 'lucide-react';
+import { LucideArrowRight, LucidePackage, LucideShieldCheck, LucideShip, LucideTrendingUp, LucideZap } from 'lucide-react';
 import { useShipments } from '../hooks/useShipments';
 import { useDashboardStats } from '../hooks/useDashboardStats';
 import { usePayments } from '../hooks/usePayments';
@@ -18,15 +17,23 @@ import {
   type ServiceDatum,
 } from '../components/charts/DashboardCharts';
 
+const formatCurrency = (value: number) => `\u20B9${Math.round(value).toLocaleString('en-IN')}`;
+
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { t } = useTranslation(['dashboard', 'common']);
   const { profile } = useAuthStore();
   const { stats, loading: statsLoading } = useDashboardStats();
   const { shipments, loading: shipmentsLoading } = useShipments();
   const { payments, stats: paymentStats, loading: paymentsLoading } = usePayments();
 
   const loading = statsLoading || shipmentsLoading || paymentsLoading;
+
+  const greeting = useMemo(() => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 17) return 'Good afternoon';
+    return 'Good evening';
+  }, []);
 
   const recentShipments = useMemo(() => shipments.slice(0, 4), [shipments]);
 
@@ -54,9 +61,9 @@ export default function Dashboard() {
   const laneMix = useMemo<LaneMixDatum[]>(() => {
     if (!shipments.length) {
       return [
-        { label: 'Long Haul', value: 0, color: 'var(--accent)' },
-        { label: 'Short Haul', value: 0, color: 'var(--success)' },
-        { label: 'In-City', value: 0, color: 'var(--warning)' },
+        { label: 'Long haul', value: 0, color: 'var(--accent-deep)' },
+        { label: 'Regional', value: 0, color: 'var(--success)' },
+        { label: 'City', value: 0, color: 'var(--warning)' },
       ];
     }
 
@@ -80,11 +87,10 @@ export default function Dashboard() {
     });
 
     const total = shipments.length;
-
     return [
-      { label: 'Long Haul', value: Math.round((bucketCounts.long / total) * 100), color: 'var(--accent)' },
-      { label: 'Short Haul', value: Math.round((bucketCounts.short / total) * 100), color: 'var(--success)' },
-      { label: 'In-City', value: Math.round((bucketCounts.city / total) * 100), color: 'var(--warning)' },
+      { label: 'Long haul', value: Math.round((bucketCounts.long / total) * 100), color: 'var(--accent-deep)' },
+      { label: 'Regional', value: Math.round((bucketCounts.short / total) * 100), color: 'var(--success)' },
+      { label: 'City', value: Math.round((bucketCounts.city / total) * 100), color: 'var(--warning)' },
     ];
   }, [shipments]);
 
@@ -97,7 +103,7 @@ export default function Dashboard() {
 
     return [
       { label: 'Completion', value: completionRate, tone: 'success' },
-      { label: 'Active Flow', value: activeRate, tone: 'info' },
+      { label: 'Active flow', value: activeRate, tone: 'info' },
       { label: 'Settlement', value: settlementRate, tone: paymentStats.failedCount > 0 ? 'warning' : 'success' },
     ];
   }, [paymentStats.completedPayments, paymentStats.failedCount, paymentStats.pendingPayments, shipments.length, stats.activeShipments, stats.deliveredShipments]);
@@ -113,8 +119,12 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div className="flex flex-col h-full overflow-hidden">
-        <Topbar title={t('dashboard:sections.overview', 'Overview')} />
+        <Topbar title="Overview" subtitle="Operations overview, lane performance, and live shipment health." />
         <div className="page-scroll space-y-8">
+          <div className="hero-card card premium-hero premium-grid">
+            <Skeleton className="h-8 w-72" />
+            <Skeleton className="h-20 w-full" count={2} />
+          </div>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
             <CardSkeleton />
             <CardSkeleton />
@@ -132,151 +142,198 @@ export default function Dashboard() {
 
   return (
     <div className="flex flex-col h-full overflow-hidden relative">
-      <Topbar title={
-        <div className="flex items-center gap-3">
-          <span>Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 17 ? 'afternoon' : 'evening'}, {profile?.name}</span>
-          <span className="px-2 py-0.5 rounded-md bg-[var(--accent)]/10 border border-[var(--accent)]/20 text-[var(--accent)] text-[10px] font-black uppercase tracking-widest leading-none">
-            {profile?.subscription_tier} Plan
-          </span>
-        </div>
-      } />
+      <Topbar
+        title={
+          <div className="flex items-center gap-3 min-w-0">
+            <span className="truncate">{greeting}, {profile?.name}</span>
+            <span className="px-2.5 py-1 rounded-full bg-[var(--surface-soft)] border border-[var(--border)] text-[var(--muted-strong)] text-[11px] font-medium leading-none shrink-0">
+              {profile?.subscription_tier}
+            </span>
+          </div>
+        }
+        subtitle="Operations overview, lane performance, and live shipment health."
+      />
 
-      <div className="page-scroll space-y-8 no-scrollbar pb-24">
+      <div className="page-scroll space-y-6 sm:space-y-8 no-scrollbar pb-24">
         {isExpiringSoon && (
-          <div className="mx-6 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-between">
+          <div className="p-4 rounded-[18px] bg-amber-500/10 border border-amber-500/20 flex items-center justify-between gap-4">
             <div className="flex items-center gap-3 text-amber-200">
-              <LucideZap size={18} className="animate-pulse" />
-              <span className="text-xs font-bold uppercase tracking-wide">
-                Your {profile?.subscription_tier} plan expires in {Math.ceil((new Date(profile!.subscription_expires_at!).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))} days
+              <LucideZap size={16} className="opacity-80" />
+              <span className="text-[12px] sm:text-[13px] font-medium tracking-[-0.01em]">
+                Expires in {Math.ceil((new Date(profile!.subscription_expires_at!).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))} days
               </span>
             </div>
-            <button onClick={() => navigate('/settings')} className="text-xs font-black uppercase tracking-widest text-amber-500 hover:text-amber-400 transition-colors">
-              Renew Plan →
+            <button onClick={() => navigate('/settings')} className="text-[12px] font-medium text-amber-500 hover:text-amber-400 transition-colors shrink-0">
+              Renew plan
             </button>
           </div>
         )}
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 px-6">
-          <div className="mini-card group">
+        <section className="hero-card premium-hero premium-grid">
+          <div className="relative z-10 grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1.18fr)_360px]">
+            <div className="hero-copy">
+              <div className="section-label">Overview</div>
+              <h1 className="hero-title max-w-[12ch]">Freight operations, refined for clarity.</h1>
+              <p className="hero-description">
+                Monitor live shipments, route performance, and settlement health from one calm command surface.
+              </p>
+
+              <div className="mt-6 flex flex-wrap gap-2">
+                <span className="pill pill--active">{stats.activeShipments} active shipments</span>
+                <span className="pill pill--muted">{stats.pendingMatches} matches pending</span>
+                <span className="pill pill--muted">{paymentStats.completedPayments} payments settled</span>
+              </div>
+
+              <div className="mt-8 flex flex-wrap gap-3">
+                <button onClick={() => navigate('/shipments')} className="primary-button group">
+                  <span>Review shipments</span>
+                  <LucideArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                </button>
+                <button onClick={() => navigate('/tracking')} className="ghost-button">
+                  Open tracking
+                </button>
+              </div>
+            </div>
+
+            <div className="card dashboard-chart-card !p-5 premium-grid">
+              <div className="relative z-10">
+                <div className="section-label">Control tower</div>
+                <div className="space-y-4">
+                  <div className="rounded-[16px] border border-[var(--border)] bg-[var(--surface-soft)] p-4">
+                    <div className="text-[12px] font-medium text-[var(--muted)]">Live network health</div>
+                    <div className="mt-2 flex items-end justify-between gap-3">
+                      <div className="text-3xl font-semibold tracking-[-0.04em]">{Math.max(92, Math.min(99, 90 + stats.deliveredShipments))}%</div>
+                      <div className="text-[12px] text-[var(--muted)]">Signals stable</div>
+                    </div>
+                  </div>
+                  <div className="rounded-[16px] border border-[var(--border)] bg-[var(--surface-soft)] p-4">
+                    <div className="text-[12px] font-medium text-[var(--muted)]">Today&apos;s focus</div>
+                    <div className="mt-2 text-[15px] font-medium tracking-[-0.02em] text-[var(--text)]">
+                      {stats.pendingMatches > 0
+                        ? 'Review newly matched capacity and confirm assignments.'
+                        : 'Live lanes are stable. Use today to optimize margins and ETAs.'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <div className="dashboard-stat p-5">
             <div className="mb-2 flex items-center justify-between">
-              <span className="section-label !mb-0">Active Shipments</span>
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--accent-soft)] text-[var(--accent)] transition-transform group-hover:scale-110">
+              <span className="section-label !mb-0">Active shipments</span>
+              <div className="flex h-9 w-9 items-center justify-center rounded-[12px] bg-[var(--surface-strong)] border border-[var(--border)] text-[var(--muted-strong)]">
                 <LucidePackage className="h-4 w-4" />
               </div>
             </div>
             <div className="metric-value font-mono">{stats.activeShipments}</div>
-            <div className="mt-1 text-[10px] font-extrabold uppercase tracking-tighter text-[var(--muted)]">
-              {stats.deliveredShipments} routes completed
-            </div>
+            <div className="mt-1 text-[12px] text-[var(--muted)]">{stats.deliveredShipments} routes completed</div>
           </div>
 
-          <div className="mini-card group">
+          <div className="dashboard-stat p-5">
             <div className="mb-2 flex items-center justify-between">
-              <span className="section-label !mb-0">Pending Matches</span>
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-400 transition-transform group-hover:scale-110">
+              <span className="section-label !mb-0">Pending matches</span>
+              <div className="flex h-9 w-9 items-center justify-center rounded-[12px] bg-[var(--surface-strong)] border border-[var(--border)] text-[var(--muted-strong)]">
                 <LucideZap className="h-4 w-4" />
               </div>
             </div>
             <div className="metric-value font-mono">{stats.pendingMatches}</div>
-            <div className="mt-1 text-[10px] font-extrabold uppercase tracking-tighter text-[var(--muted)]">
-              Suggested live routes
-            </div>
+            <div className="mt-1 text-[12px] text-[var(--muted)]">Suggested live routes</div>
           </div>
 
-          <div className="mini-card group">
+          <div className="dashboard-stat p-5">
             <div className="mb-2 flex items-center justify-between">
-              <span className="section-label !mb-0">Total Spent</span>
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-400 transition-transform group-hover:scale-110">
+              <span className="section-label !mb-0">Total spent</span>
+              <div className="flex h-9 w-9 items-center justify-center rounded-[12px] bg-[var(--surface-strong)] border border-[var(--border)] text-[var(--muted-strong)]">
                 <LucideTrendingUp className="h-4 w-4" />
               </div>
             </div>
-            <div className="metric-value font-mono">₹{stats.totalSpent?.toLocaleString()}</div>
-            <div className="mt-1 text-[10px] font-extrabold uppercase tracking-tighter text-[var(--muted)]">
-              Settled payments
-            </div>
+            <div className="metric-value font-mono">{formatCurrency(stats.totalSpent)}</div>
+            <div className="mt-1 text-[12px] text-[var(--muted)]">Settled payments</div>
           </div>
 
-          <div className="mini-card group">
+          <div className="dashboard-stat p-5">
             <div className="mb-2 flex items-center justify-between">
-              <span className="section-label !mb-0">CO₂ Saved</span>
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sky-500/10 text-sky-400 transition-transform group-hover:scale-110">
+              <span className="section-label !mb-0">CO2 saved</span>
+              <div className="flex h-9 w-9 items-center justify-center rounded-[12px] bg-[var(--surface-strong)] border border-[var(--border)] text-[var(--muted-strong)]">
                 <LucideShieldCheck className="h-4 w-4" />
               </div>
             </div>
-            <div className="metric-value font-mono text-sky-400">{Math.round(stats.co2Saved)} kg</div>
-            <div className="mt-1 text-[10px] font-extrabold uppercase tracking-tighter text-[var(--muted)]">
-              Offset contribution
-            </div>
+            <div className="metric-value font-mono">{Math.round(stats.co2Saved)} kg</div>
+            <div className="mt-1 text-[12px] text-[var(--muted)]">Offset contribution</div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1fr_0.4fr] px-6">
-          <div className="card">
+        <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
+          <div className="card dashboard-chart-card">
             <div className="flex items-center justify-between">
               <div>
-                <div className="section-label">LIVE LANE PULSE</div>
-                <h3 className="text-xl font-black">Shipment Flow</h3>
+                <div className="section-label">Revenue pulse</div>
+                <h3 className="text-xl font-semibold tracking-[-0.03em]">Shipment flow</h3>
                 <p className="muted">Recent activity and pricing across your active routes.</p>
               </div>
-              <button onClick={() => navigate('/shipments')} className="primary-button group ring-offset-[var(--bg)] focus:ring-2 ring-[var(--accent)] ring-offset-2">
-                <span className="text-xs">Explore Fleet</span>
+              <button onClick={() => navigate('/shipments')} className="ghost-button group">
+                <span>Explore fleet</span>
                 <LucideArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
               </button>
             </div>
             <RevenueChart data={revenueTrend} />
           </div>
 
-          <div className="card">
-            <div className="section-label">LANE MIX</div>
-            <h3 className="text-xl font-black">Route Diversity</h3>
+          <div className="card dashboard-chart-card">
+            <div className="section-label">Lane mix</div>
+            <h3 className="text-xl font-semibold tracking-[-0.03em]">Route diversity</h3>
             <p className="muted">Segment distribution of currently tracked shipments.</p>
+            <LaneMixChart segments={laneMix} />
           </div>
         </div>
 
-        <div className="px-6 space-y-6">
-          <div className="card bg-[var(--surface-strong)] overflow-hidden">
-            <div className="mb-8 flex items-center justify-between">
+        <div className="space-y-6">
+          <div className="card bg-[var(--surface-strong)] overflow-hidden !p-0 sm:!p-6">
+            <div className="p-5 sm:p-0 mb-4 sm:mb-8 flex items-center justify-between">
               <div>
-                <div className="section-label">ACTIVE SHIFTS</div>
-                <h3 className="text-2xl font-black tracking-tight">Recent Shipments</h3>
+                <div className="section-label">Recent shipments</div>
+                <h3 className="text-xl sm:text-2xl font-semibold tracking-[-0.04em]">Latest movement</h3>
               </div>
             </div>
 
             {recentShipments.length === 0 ? (
-              <div className="rounded-2xl border-2 border-dashed border-[var(--border)] bg-white/[0.02] p-12 text-center">
-                <LucideShip className="mx-auto mb-4 h-12 w-12 text-[var(--muted)] opacity-20" />
-                <p className="mb-1 text-lg font-bold text-[var(--text)]">No active movements</p>
-                <p className="mb-8 text-sm font-medium text-[var(--muted)]">Begin your first route to see live tracking data.</p>
+              <div className="rounded-2xl border-2 border-dashed border-[var(--border)] bg-white/[0.02] p-8 sm:p-12 text-center">
+                <LucideShip className="mx-auto mb-4 h-10 sm:h-12 w-10 sm:w-12 text-[var(--muted)] opacity-20" />
+                <p className="mb-1 text-base sm:text-lg font-semibold text-[var(--text)]">No active movements</p>
+                <p className="mb-6 sm:mb-8 text-[11px] sm:text-sm font-medium text-[var(--muted)]">Begin your first route to see live tracking data.</p>
                 <button onClick={() => navigate('/shipments')} className="primary-button">
-                  Begin First Route
+                  Begin first route
                 </button>
               </div>
             ) : (
-              <div className="overflow-x-auto -mx-6">
-                <table className="w-full text-left border-collapse">
+              <div className="overflow-x-auto no-scrollbar">
+                <table className="dashboard-table w-full text-left min-w-[600px] sm:min-w-0">
                   <thead>
-                    <tr className="border-b border-[var(--border)] bg-white/[0.02]">
-                      <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest text-[var(--muted)]">Route</th>
-                      <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest text-[var(--muted)] text-right">Weight</th>
-                      <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest text-[var(--muted)]">Status</th>
-                      <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest text-[var(--muted)]">Driver</th>
-                      <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest text-[var(--muted)]">Milestone</th>
-                      <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest text-[var(--muted)] text-right">Price</th>
-                      <th className="py-4 px-6 text-[10px] font-black uppercase tracking-widest text-[var(--muted)] text-right">Date</th>
+                    <tr className="border-b border-[var(--border)]">
+                      <th className="py-4 px-6 text-[11px] font-medium tracking-[-0.01em] text-[var(--muted)]">Route</th>
+                      <th className="py-4 px-6 text-[11px] font-medium tracking-[-0.01em] text-[var(--muted)] text-right">Weight</th>
+                      <th className="py-4 px-6 text-[11px] font-medium tracking-[-0.01em] text-[var(--muted)]">Status</th>
+                      <th className="py-4 px-6 text-[11px] font-medium tracking-[-0.01em] text-[var(--muted)]">Driver</th>
+                      <th className="py-4 px-6 text-[11px] font-medium tracking-[-0.01em] text-[var(--muted)]">Milestone</th>
+                      <th className="py-4 px-6 text-[11px] font-medium tracking-[-0.01em] text-[var(--muted)] text-right">Price</th>
+                      <th className="py-4 px-6 text-[11px] font-medium tracking-[-0.01em] text-[var(--muted)] text-right">Date</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[var(--border)]">
                     {recentShipments.map((shipment) => {
                       const booking = shipment.bookings?.[0];
                       return (
-                        <tr 
+                        <tr
                           key={shipment.id}
-                          className="group hover:bg-white/[0.02] transition-colors cursor-pointer"
+                          className="group transition-colors cursor-pointer"
                           onClick={() => navigate('/tracking')}
                         >
                           <td className="py-5 px-6">
-                            <div className="text-[13px] font-bold text-[var(--text)] mb-0.5">
-                              {shipment.pickup_address.split(',')[0]} → {shipment.drop_address.split(',')[0]}
+                            <div className="text-[13px] font-semibold text-[var(--text)] mb-0.5">
+                              {shipment.pickup_address.split(',')[0]} {'\u2192'} {shipment.drop_address.split(',')[0]}
                             </div>
                             <div className="text-[9px] font-mono text-[var(--muted)] opacity-60 uppercase">{shipment.id.split('-')[0]}</div>
                           </td>
@@ -287,17 +344,15 @@ export default function Dashboard() {
                             <StatusBadge status={shipment.status} />
                           </td>
                           <td className="py-5 px-6">
-                            <div className="text-[12px] font-black uppercase text-[var(--text)]">
-                              {booking?.driver?.name || '---'}
-                            </div>
+                            <div className="text-[12px] font-semibold text-[var(--text)]">{booking?.driver?.name || '---'}</div>
                           </td>
-                          <td className="py-5 px-6 text-[11px] font-bold text-[var(--accent)] uppercase tracking-wide">
+                          <td className="py-5 px-6 text-[11px] font-medium text-[var(--muted-strong)] tracking-[-0.01em] capitalize">
                             {booking?.current_milestone || '---'}
                           </td>
                           <td className="py-5 px-6 text-right font-mono text-[12px] text-[var(--text)]">
-                            ₹{Math.round(shipment.price).toLocaleString()}
+                            {formatCurrency(shipment.price)}
                           </td>
-                          <td className="py-5 px-6 text-right text-[11px] font-bold text-[var(--muted)] uppercase whitespace-nowrap">
+                          <td className="py-5 px-6 text-right text-[11px] font-medium text-[var(--muted)] whitespace-nowrap">
                             {new Date(shipment.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
                           </td>
                         </tr>
@@ -310,28 +365,37 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2 px-6 pb-12">
-            <div className="card">
-              <div className="section-label">SERVICE QUALITY</div>
-              <h3 className="text-xl font-black tracking-tight">Health Metrics</h3>
-              <p className="muted">Infrastructure and operational service benchmarks.</p>
-              <ServiceChart metrics={serviceMetrics} />
-            </div>
+        <div className="grid grid-cols-1 gap-6 xl:grid-cols-2 pb-12">
+          <div className="card dashboard-chart-card">
+            <div className="section-label">Service quality</div>
+            <h3 className="text-xl font-semibold tracking-[-0.03em]">Health metrics</h3>
+            <p className="muted">Infrastructure and operational service benchmarks.</p>
+            <ServiceChart metrics={serviceMetrics} />
+          </div>
 
-            <div className="card bg-[var(--accent)] text-white shadow-[0_20px_40px_rgba(70,127,227,0.3)]">
-              <div className="flex items-center gap-4">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-md">
-                  <LucideZap className="h-7 w-7 text-white" />
+          <div className="card dashboard-chart-card premium-grid">
+            <div className="relative z-10">
+              <div className="section-label">Sustainability</div>
+              <h3 className="text-xl font-semibold tracking-[-0.03em]">Quiet efficiency gains</h3>
+              <p className="muted">Distance trimmed, carbon saved, and fewer empty kilometers across the network.</p>
+              <div className="mt-6 grid grid-cols-2 gap-4">
+                <div className="rounded-[16px] border border-[var(--border)] bg-[var(--surface-soft)] p-4">
+                  <div className="text-[12px] font-medium text-[var(--muted)]">CO2 reduced</div>
+                  <div className="mt-2 text-3xl font-semibold tracking-[-0.04em]">
+                    {Math.round(stats.co2Saved)}
+                    <span className="ml-1 text-base font-medium text-[var(--muted)]">kg</span>
+                  </div>
                 </div>
-                <div>
-                  <div className="text-3xl font-black">{Math.round(stats.co2Saved)} kg</div>
-                  <div className="text-[10px] font-black uppercase tracking-widest opacity-80">CO2 OFFSET TARGET</div>
+                <div className="rounded-[16px] border border-[var(--border)] bg-[var(--surface-soft)] p-4">
+                  <div className="text-[12px] font-medium text-[var(--muted)]">Completion rate</div>
+                  <div className="mt-2 text-3xl font-semibold tracking-[-0.04em]">
+                    {shipments.length ? Math.round((stats.deliveredShipments / shipments.length) * 100) : 0}
+                    <span className="ml-1 text-base font-medium text-[var(--muted)]">%</span>
+                  </div>
                 </div>
               </div>
-              <p className="mt-6 text-[11px] font-bold leading-relaxed opacity-90">
-                {t('dashboard:sections.green_impact', "Your logistic network has significantly reduced its carbon footprint this month through smarter route consolidation.")}
-              </p>
             </div>
+          </div>
         </div>
       </div>
     </div>

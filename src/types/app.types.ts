@@ -22,6 +22,16 @@ export type Booking = Database['public']['Tables']['bookings']['Row'] & {
 };
 
 export type Payment = Database['public']['Tables']['payments']['Row'];
+export type PaymentWithRelations = Payment & {
+  booking: {
+    id: string;
+    business_id: string;
+    shipment: {
+      pickup_address: string;
+      drop_address: string;
+    };
+  };
+};
 
 export type Message = Database['public']['Tables']['messages']['Row'] & {
   sender?: Profile;

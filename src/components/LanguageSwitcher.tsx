@@ -20,7 +20,7 @@ export function LanguageSwitcher() {
   return (
     <button
       onClick={() => i18n.changeLanguage(next.code)}
-      className="px-3.5 py-2 rounded-xl text-[10px] font-black tracking-widest transition-all duration-300 bg-[var(--surface-soft)] border border-[var(--border)] text-[var(--text)] hover:bg-[var(--surface-strong)] hover:border-[var(--border-strong)]"
+      className="px-3 py-2 rounded-[12px] text-[11px] font-medium tracking-[0.02em] transition-all duration-300 bg-[var(--surface-soft)] border border-[var(--border)] text-[var(--text)] hover:bg-[var(--surface-strong)] hover:border-[var(--border-strong)]"
       title={`Switch to ${next.name}`}
     >
       {current.label}

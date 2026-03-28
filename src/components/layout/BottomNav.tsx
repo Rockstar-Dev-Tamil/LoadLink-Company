@@ -15,12 +15,12 @@ export function BottomNav() {
   const location = useLocation();
 
   const items = useMemo<NavItem[]>(() => [
-    { id: 'dashboard', path: '/dashboard', label: 'Home', icon: <LucideLayoutDashboard size={18} /> },
-    { id: 'shipments', path: '/shipments', label: 'Ship', icon: <LucideBox size={18} /> },
-    { id: 'tracking', path: '/tracking', label: 'Track', icon: <LucideMapPin size={18} /> },
-    { id: 'maps', path: '/maps', label: 'Maps', icon: <LucideMap size={18} /> },
-    { id: 'messages', path: '/messages', label: 'Chat', icon: <LucideMessageSquare size={18} /> },
-    { id: 'settings', path: '/settings', label: 'Settings', icon: <LucideSettings size={18} /> },
+    { id: 'dashboard', path: '/dashboard', label: 'Home', icon: <LucideLayoutDashboard size={20} /> },
+    { id: 'shipments', path: '/shipments', label: 'Ship', icon: <LucideBox size={20} /> },
+    { id: 'tracking', path: '/tracking', label: 'Track', icon: <LucideMapPin size={20} /> },
+    { id: 'maps', path: '/maps', label: 'Maps', icon: <LucideMap size={20} /> },
+    { id: 'messages', path: '/messages', label: 'Chat', icon: <LucideMessageSquare size={20} /> },
+    { id: 'settings', path: '/settings', label: 'Settings', icon: <LucideSettings size={20} /> },
   ], []);
 
   const activePath = location.pathname.startsWith('/navigation') ? '/tracking' : location.pathname;
@@ -44,7 +44,7 @@ export function BottomNav() {
             )}
             aria-current={active ? 'page' : undefined}
           >
-            <span className={cn('bottom-nav-icon', active ? 'text-[var(--accent)]' : 'text-[var(--muted)]')}>
+            <span className={cn('bottom-nav-icon', active ? 'text-[var(--text)]' : 'text-[var(--muted)]')}>
               {item.icon}
             </span>
             <span className="bottom-nav-label">{item.label}</span>

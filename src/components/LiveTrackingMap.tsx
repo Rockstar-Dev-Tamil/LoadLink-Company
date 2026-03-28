@@ -204,17 +204,18 @@ const RoutingControl = ({
       waypoints: [L.latLng(start.lat, start.lng), L.latLng(end.lat, end.lng)],
       router,
       addWaypoints: false,
-      draggableWaypoints: false,
       fitSelectedRoutes: false,
       show: false,
       createMarker: () => null as any,
       lineOptions: {
+        extendToWaypoints: true,
+        missingRouteTolerance: 0,
         styles: [
           { color: 'rgba(55, 115, 255, 0.22)', weight: 12, opacity: 1 },
           { color, opacity: 0.85, weight: 4 },
         ],
       },
-    }).on('routesfound', (e: any) => {
+    } as any).on('routesfound', (e: any) => {
       const route = e?.routes?.[0];
       if (!route) return;
 

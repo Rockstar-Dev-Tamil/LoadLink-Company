@@ -4,7 +4,7 @@ import { useAuthStore } from '@/stores/authStore'
 import type { Booking } from '@/types/app.types'
 
 export function useBookings() {
-  const { user } = useAuthStore()
+  const { user, initialized } = useAuthStore()
   const [bookings, setBookings] = useState<Booking[]>([])
   const [loading, setLoading]   = useState(true)
   const [error, setError]       = useState<string | null>(null)
@@ -16,7 +16,13 @@ export function useBookings() {
   }, [])
 
   const fetchBookings = useCallback(async () => {
-    if (!user?.id) return
+    if (!initialized) return
+    if (!user?.id) {
+      setBookings([])
+      setError(null)
+      setLoading(false)
+      return
+    }
     if (!bookings.length) setLoading(true)
     setError(null)
 
@@ -35,12 +41,12 @@ export function useBookings() {
 
     setBookings((data as unknown as Booking[]) ?? [])
     setLoading(false)
-  }, [user?.id])
+  }, [initialized, user?.id])
 
   useEffect(() => { fetchBookings() }, [fetchBookings])
 
   useEffect(() => {
-    if (!user?.id) return
+    if (!initialized || !user?.id) return
     const ch = supabase
       .channel(`rt_bookings_full_${user.id}`)
       .on('postgres_changes', {
@@ -64,7 +70,7 @@ export function useBookings() {
       })
       .subscribe()
     return () => { supabase.removeChannel(ch) }
-  }, [user?.id])
+  }, [initialized, user?.id])
 
   return { bookings, loading, error, refetch: fetchBookings }
 }

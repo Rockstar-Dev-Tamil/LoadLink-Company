@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
-import { LucideRadio, LucideSquare, LucideTruck, LucideRefreshCw, LucideMapPin, LucideCheckCircle2 } from 'lucide-react';
+import { LucideRadio, LucideSquare, LucideTruck, LucideRefreshCw, LucideMapPin, LucideCheckCircle2, LucidePackageSearch, LucideArrowRight, LucideWallet } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuthStore } from '@/stores/authStore';
 import { useGeolocationBroadcast } from '@/hooks/useGeolocationBroadcast';
 import { useDriverBookings } from '@/hooks/useDriverBookings';
+import { useOpenShipments } from '@/hooks/useOpenShipments';
 import { supabase } from '@/lib/supabase';
 
 const MILESTONES = [
@@ -26,12 +27,18 @@ export default function DriverBroadcast() {
   const driverId = user?.id ?? null;
   const broadcast = useGeolocationBroadcast(driverId);
   const { bookings, activeBooking, loading, error } = useDriverBookings(driverId);
+  const { shipments: openShipments, totalWeightKg, loading: openShipmentsLoading, error: openShipmentsError } = useOpenShipments();
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [bookingShipmentId, setBookingShipmentId] = useState<string | null>(null);
 
   useEffect(() => {
     if (error) toast.error(error);
   }, [error]);
+
+  useEffect(() => {
+    if (openShipmentsError) toast.error(openShipmentsError);
+  }, [openShipmentsError]);
 
   useEffect(() => {
     if (selectedBookingId) return;
@@ -63,7 +70,7 @@ export default function DriverBroadcast() {
 
       const { error } = await supabase
         .from('bookings')
-        .update({ current_milestone: stage, milestone_history: nextHistory })
+        .update({ current_milestone: stage, milestone_history: nextHistory } as any)
         .eq('id', selectedBooking.id);
 
       if (error) throw error;
@@ -72,6 +79,68 @@ export default function DriverBroadcast() {
       toast.error(err?.message || 'Unable to update status');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleBookShipment = async (shipment: {
+    id: string;
+    business_id: string;
+    price: number;
+  }) => {
+    if (!driverId) return;
+    setBookingShipmentId(shipment.id);
+    try {
+      const { data: existing, error: existingError } = await supabase
+        .from('bookings')
+        .select('id')
+        .eq('shipment_id', shipment.id)
+        .maybeSingle();
+
+      if (existingError) throw existingError;
+      if (existing?.id) {
+        toast.info('Another driver already booked this shipment.');
+        return;
+      }
+
+      const { data: booking, error: bookingError } = await supabase
+        .from('bookings')
+        .insert({
+          shipment_id: shipment.id,
+          driver_id: driverId,
+          business_id: shipment.business_id,
+          route_id: null,
+          agreed_price: shipment.price,
+          status: 'requested',
+        })
+        .select()
+        .single();
+
+      if (bookingError) throw bookingError;
+
+      const { error: paymentError } = await supabase
+        .from('payments')
+        .insert({
+          booking_id: booking.id,
+          amount: shipment.price,
+          payment_status: 'pending',
+          payment_method: 'wallet_hold',
+        });
+
+      if (paymentError) throw paymentError;
+
+      const { error: shipmentError } = await supabase
+        .from('shipments')
+        .update({ status: 'requested' })
+        .eq('id', shipment.id);
+
+      if (shipmentError) throw shipmentError;
+
+      toast.success('Shipment booked. The business can now see your request.');
+      setSelectedBookingId(booking.id);
+    } catch (err: any) {
+      toast.error(err?.message || 'Unable to book this shipment');
+    } finally {
+      setBookingShipmentId(null);
     }
   };
 
@@ -114,7 +183,7 @@ export default function DriverBroadcast() {
         </div>
 
         <div className="mt-8 grid grid-cols-12 gap-6">
-          <div className="col-span-7">
+          <div className="col-span-12 xl:col-span-7">
             <div className="message-card">
               <div className="flex items-center justify-between">
                 <div>
@@ -195,7 +264,7 @@ export default function DriverBroadcast() {
             </div>
           </div>
 
-          <div className="col-span-5">
+          <div className="col-span-12 xl:col-span-5">
             <div className="message-card">
               <div className="flex items-center justify-between">
                 <div className="section-label">ASSIGNED BOOKINGS</div>
@@ -266,6 +335,95 @@ export default function DriverBroadcast() {
           </div>
         </div>
 
+        <div className="mt-8 grid grid-cols-12 gap-6">
+          <div className="col-span-12">
+            <div className="message-card">
+              <div className="flex items-center justify-between gap-4 flex-wrap">
+                <div>
+                  <div className="section-label">OPEN SHIPMENTS</div>
+                  <div className="mt-2 text-[24px] font-black tracking-tight">Live load board for drivers</div>
+                  <div className="mt-2 text-[13px] text-[var(--muted)] font-bold">
+                    Newly posted business shipments appear here so drivers can directly book them.
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="stat-tile min-w-[140px]">
+                    <div className="stat-label">OPEN LOADS</div>
+                    <div className="stat-value">{openShipments.length}</div>
+                  </div>
+                  <div className="stat-tile min-w-[140px]">
+                    <div className="stat-label">TOTAL WEIGHT</div>
+                    <div className="stat-value">{Math.round(totalWeightKg).toLocaleString()} KG</div>
+                  </div>
+                </div>
+              </div>
+
+              {openShipmentsLoading ? (
+                <div className="mt-6 text-[12px] font-bold text-[var(--muted)]">Loading open shipments…</div>
+              ) : openShipments.length === 0 ? (
+                <div className="mt-6 rounded-[20px] border border-dashed border-[var(--border)] bg-[var(--surface-soft)] p-6">
+                  <div className="flex items-center gap-3 text-[var(--muted)]">
+                    <LucidePackageSearch size={18} />
+                    <span className="text-[13px] font-bold">No open shipments right now.</span>
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-6 grid grid-cols-1 2xl:grid-cols-2 gap-4">
+                  {openShipments.map((shipment) => (
+                    <div key={shipment.id} className="rounded-[22px] border border-[var(--border)] bg-[var(--surface-soft)] p-5">
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <div className="text-[10px] font-black text-[var(--muted)] uppercase tracking-[0.2em]">
+                            Shipment {shortId(shipment.id)}
+                          </div>
+                          <div className="mt-2 text-[18px] font-black tracking-tight">
+                            {shipment.pickup_address.split(',')[0]} <span className="text-[var(--muted)]">to</span> {shipment.drop_address.split(',')[0]}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-[10px] font-black text-[var(--muted)] uppercase tracking-[0.2em]">Rate</div>
+                          <div className="mt-2 text-[22px] font-black font-mono">₹{Math.round(shipment.price).toLocaleString()}</div>
+                        </div>
+                      </div>
+
+                      <div className="mt-4 grid grid-cols-2 gap-3">
+                        <div className="stat-tile">
+                          <div className="stat-label">WEIGHT</div>
+                          <div className="stat-value">{Math.round(shipment.weight_kg).toLocaleString()} KG</div>
+                        </div>
+                        <div className="stat-tile">
+                          <div className="stat-label">LOAD TYPE</div>
+                          <div className="stat-value">{shipment.is_partial ? 'LTL' : 'FTL'}</div>
+                        </div>
+                      </div>
+
+                      <div className="mt-4 flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2 text-[12px] font-bold text-[var(--muted)]">
+                          <LucideWallet size={14} />
+                          Booking creates a request for the business
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleBookShipment(shipment)}
+                          disabled={bookingShipmentId === shipment.id}
+                          className="primary-button h-11 px-5 text-[10px] font-black tracking-[0.2em] uppercase"
+                        >
+                          {bookingShipmentId === shipment.id ? 'Booking…' : (
+                            <>
+                              Book Shipment
+                              <LucideArrowRight size={15} />
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
         <div className="mt-8 text-[12px] font-bold text-[var(--muted)] max-w-[92ch]">
           If your business dashboard still shows &quot;Signal lost&quot;, it usually means:
           1) this page is not running on the driver device, 2) geolocation permission was denied, or
@@ -275,4 +433,3 @@ export default function DriverBroadcast() {
     </div>
   );
 }
-

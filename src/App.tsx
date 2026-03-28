@@ -31,6 +31,7 @@ const preloadShipments = () => import('@/pages/ActiveShipments');
 const preloadTracking = () => import('@/pages/Tracking');
 const preloadPayments = () => import('@/pages/Payments');
 const preloadMessages = () => import('@/pages/Messages');
+const preloadSimulator = () => import('@/pages/Simulator');
 
 export const PAGE_PRELOADERS = {
   dashboard: preloadDashboard,
@@ -38,6 +39,7 @@ export const PAGE_PRELOADERS = {
   tracking:  preloadTracking,
   payments:  preloadPayments,
   messages:  preloadMessages,
+  simulator: preloadSimulator,
 };
 
 function LandingRedirect() {
@@ -86,6 +88,14 @@ const router = createBrowserRouter([
             element: (
               <Suspense fallback={<PageLoader />}>
                 <DriverBroadcast />
+              </Suspense>
+            ),
+          },
+          {
+            path: '/driver/simulator',
+            element: (
+              <Suspense fallback={<PageLoader />}>
+                <Simulator />
               </Suspense>
             ),
           },

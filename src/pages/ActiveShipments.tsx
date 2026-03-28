@@ -6,6 +6,7 @@ import { Skeleton } from '../components/Skeleton';
 import { StatusBadge } from '../components/StatusBadge';
 import { ChatWindow } from '../components/ChatWindow';
 import { Topbar } from '../components/Topbar';
+import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { MessageSquare, Package, Truck, LucideZap, LucideShip, LucideInfo, LucideHistory, LucideFilter, LucideMapPin } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -63,21 +64,23 @@ export default function ActiveShipments() {
       <Topbar title={t('tracking:header.title', 'Shipments')} subtitle="Status filters, shipment detail, and messaging." />
 
       <div className="page-scroll pb-24">
-        <div className="flex flex-col h-full min-h-0 gap-6 overflow-hidden">
-            <div className="card !p-0 overflow-hidden bg-[var(--surface-strong)]">
-              <div className="p-6 pb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        {/* Let the page scroll naturally; avoid fixed-height + overflow hidden which can "cut" cards on small screens. */}
+        <div className="flex flex-col min-h-0 gap-6">
+            <div className="card premium-grid !p-0 overflow-hidden bg-[var(--surface-strong)]">
+              <div className="p-7 pb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="min-w-0">
                   <div className="section-label">SHIPMENTS</div>
-                  <div className="text-2xl font-black tracking-tighter text-[var(--text)]">
-                    {visibleShipments.length}{' '}Active View
+                  <div className="text-[30px] sm:text-[34px] font-semibold tracking-[-0.04em] text-[var(--text)]">
+                    <span className="font-semibold">{visibleShipments.length}</span>
+                    <span className="ml-1">Active View</span>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[var(--muted)] shrink-0">
-                  <LucideFilter size={12} />
+                <div className="flex items-center gap-2 text-[12px] font-medium uppercase tracking-[0.12em] text-[var(--muted)] shrink-0 select-none">
+                  <LucideFilter size={16} />
                   Filters
                 </div>
               </div>
-              <div className="px-6 pb-6">
+              <div className="px-7 pb-7">
                 <div className="flex flex-wrap gap-2">
                   {[
                     { id: 'active', label: 'Active' },
@@ -103,33 +106,15 @@ export default function ActiveShipments() {
 
             {/* Mobile switcher (same UI, different layout) */}
             {!!activeShipment && (
-              <div className="xl:hidden -mt-2">
-                <div className="p-1 rounded-[22px] border border-[var(--border)] bg-[var(--surface-strong)] shadow-[0_20px_50px_rgba(0,0,0,0.25)]">
-                  <div className="grid grid-cols-2 gap-1">
-                    <button
-                      type="button"
-                      onClick={() => setMobileView('selected')}
-                      className={`h-11 rounded-[18px] text-[10px] font-black uppercase tracking-widest transition-all ${
-                        mobileView === 'selected'
-                          ? 'bg-[var(--accent-soft)] text-[var(--text)] border border-[var(--accent)]/20'
-                          : 'text-[var(--muted)] hover:text-[var(--text)]'
-                      }`}
-                    >
-                      Selected
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setMobileView('fleet')}
-                      className={`h-11 rounded-[18px] text-[10px] font-black uppercase tracking-widest transition-all ${
-                        mobileView === 'fleet'
-                          ? 'bg-[var(--accent-soft)] text-[var(--text)] border border-[var(--accent)]/20'
-                          : 'text-[var(--muted)] hover:text-[var(--text)]'
-                      }`}
-                    >
-                      Fleet
-                    </button>
-                  </div>
-                </div>
+              <div className="xl:hidden sticky top-0 z-30 pt-1 -mt-2">
+                <SegmentedControl
+                  value={mobileView}
+                  onChange={setMobileView}
+                  options={[
+                    { value: 'selected', label: 'Selected' },
+                    { value: 'fleet', label: 'Fleet' },
+                  ]}
+                />
               </div>
             )}
 
@@ -146,14 +131,14 @@ export default function ActiveShipments() {
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 xl:grid-cols-[1fr_420px] gap-6 min-h-0">
-                <div className={`min-w-0 ${mobileView === 'selected' ? '' : 'hidden xl:block'}`}>
+              <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_minmax(360px,420px)] gap-6 min-w-0 xl:h-[calc(100dvh-220px)]">
+                <div className={`min-w-0 xl:min-h-0 xl:overflow-y-auto xl:no-scrollbar ${mobileView === 'selected' ? '' : 'hidden xl:block'}`}>
                   {/* Active Focus Card */}
-                  <div className="card !p-0 overflow-hidden bg-[var(--surface-strong)]">
-                    <div className="p-6 pb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="card premium-grid !p-0 overflow-hidden bg-[var(--surface-strong)]">
+                    <div className="p-7 pb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                       <div className="min-w-0">
                         <div className="section-label">SELECTED TERMINAL</div>
-                        <div className="text-2xl font-black tracking-tighter text-[var(--text)]">
+                        <div className="text-[32px] sm:text-[38px] font-semibold tracking-[-0.05em] text-[var(--text)]">
                           {activeShipment.id.split('-')[0].toUpperCase()}
                         </div>
                       </div>
@@ -162,35 +147,35 @@ export default function ActiveShipments() {
                       </div>
                     </div>
 
-                    <div className="px-6 space-y-7 pb-6">
-                      <div className="relative pl-6 space-y-8 border-l-2 border-dashed border-[var(--border)] ml-2 py-2">
+                    <div className="px-7 space-y-7 pb-7">
+                      <div className="relative pl-7 space-y-10 border-l-2 border-dashed border-[var(--border)] ml-2 py-2">
                         <div className="relative">
-                          <span className="absolute -left-[19px] top-1 w-4 h-4 rounded-full bg-[var(--accent)] border-4 border-[var(--surface-strong)] z-10 shadow-[0_0_12px_var(--accent-soft)]"></span>
-                          <div className="text-[10px] font-black text-[var(--muted)] uppercase tracking-widest mb-1.5">{t('tracking:details.pickup', 'Origin Node')}</div>
-                          <div className="text-xs text-[var(--text)] font-black leading-tight break-words">{activeShipment.pickup_address}</div>
+                          <span className="absolute -left-[23px] top-1.5 w-5 h-5 rounded-full bg-[var(--accent)] border-4 border-[var(--surface-strong)] z-10 shadow-[0_0_12px_var(--accent-soft)]"></span>
+                          <div className="text-[11px] font-semibold text-[var(--muted)] uppercase tracking-[0.14em] mb-2">{t('tracking:details.pickup', 'Origin Node')}</div>
+                          <div className="text-[16px] text-[var(--text)] font-semibold leading-tight break-words">{activeShipment.pickup_address}</div>
                         </div>
                         <div className="relative">
-                          <span className="absolute -left-[19px] top-1 w-4 h-4 rounded-full bg-emerald-500 border-4 border-[var(--surface-strong)] z-10 shadow-[0_0_12px_rgba(16,185,129,0.3)]"></span>
-                          <div className="text-[10px] font-black text-[var(--muted)] uppercase tracking-widest mb-1.5">{t('tracking:details.drop', 'Destination Target')}</div>
-                          <div className="text-xs text-[var(--text)] font-black leading-tight break-words">{activeShipment.drop_address}</div>
+                          <span className="absolute -left-[23px] top-1.5 w-5 h-5 rounded-full bg-emerald-500 border-4 border-[var(--surface-strong)] z-10 shadow-[0_0_12px_rgba(16,185,129,0.3)]"></span>
+                          <div className="text-[11px] font-semibold text-[var(--muted)] uppercase tracking-[0.14em] mb-2">{t('tracking:details.drop', 'Destination Target')}</div>
+                          <div className="text-[16px] text-[var(--text)] font-semibold leading-tight break-words">{activeShipment.drop_address}</div>
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        <div className="min-w-0 bg-[var(--surface-soft)] p-3 rounded-2xl border border-[var(--border)] group hover:border-[var(--border-strong)] transition-all">
-                          <div className="text-[8px] font-black text-[var(--muted)] uppercase tracking-widest mb-1 items-center flex gap-1">
-                            <Package size={10} /> Payload
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="infocard min-w-0 p-4 rounded-2xl group hover:border-[var(--border-strong)] transition-all">
+                          <div className="text-[11px] font-semibold text-[var(--muted)] uppercase tracking-[0.14em] mb-2 items-center flex gap-2">
+                            <Package size={14} /> Payload
                           </div>
-                          <div className="text-sm font-black text-[var(--text)]">
+                          <div className="text-[24px] font-semibold tracking-[-0.03em] text-[var(--text)]">
                             {activeShipment.weight_kg}{' '}
-                            <span className="text-[8px] opacity-40">KG</span>
+                            <span className="text-[12px] opacity-50">KG</span>
                           </div>
                         </div>
-                        <div className="min-w-0 bg-[var(--surface-soft)] p-3 rounded-2xl border border-[var(--border)] group hover:border-[var(--border-strong)] transition-all">
-                          <div className="text-[8px] font-black text-[var(--muted)] uppercase tracking-widest mb-1 items-center flex gap-1">
-                            <LucideZap size={10} /> Value
+                        <div className="infocard min-w-0 p-4 rounded-2xl group hover:border-[var(--border-strong)] transition-all">
+                          <div className="text-[11px] font-semibold text-[var(--muted)] uppercase tracking-[0.14em] mb-2 items-center flex gap-2">
+                            <LucideZap size={14} /> Value
                           </div>
-                          <div className="text-sm font-black text-rose-500 font-mono text-right">
+                          <div className="text-[24px] font-semibold text-rose-500 font-mono text-right tracking-[-0.03em]">
                             {'\u20B9'}{Math.round(activeBooking?.agreed_price ?? activeShipment.price).toLocaleString()}
                           </div>
                         </div>
@@ -198,25 +183,37 @@ export default function ActiveShipments() {
 
                       {activeBooking && (
                         <div className="space-y-3">
-                          <div className="p-4 rounded-[22px] bg-[var(--accent)]/[0.03] border border-[var(--accent-soft)]/20 flex items-center justify-between group cursor-pointer hover:bg-[var(--accent-soft)]/5 transition-all">
+                          <div className="infocard p-5 rounded-[22px] flex items-center justify-between group cursor-pointer transition-all">
                             <div className="flex items-center gap-4 min-w-0">
-                              <div className="w-10 h-10 rounded-xl bg-[var(--accent)] flex items-center justify-center text-white shrink-0">
-                                <Truck size={18} />
+                              <div className="w-12 h-12 rounded-2xl bg-[var(--accent-deep)] flex items-center justify-center text-white shrink-0">
+                                <Truck size={22} />
                               </div>
                               <div className="min-w-0">
-                                <div className="text-[9px] font-black text-[var(--accent)] opacity-60 uppercase tracking-widest">Driver Identity</div>
-                                <div className="text-xs font-black text-[var(--text)] truncate">#{activeBooking.driver_id.split('-')[0].toUpperCase()}</div>
+                                <div className="text-[11px] font-semibold text-[var(--muted)] uppercase tracking-[0.14em]">Driver Identity</div>
+                                <div className="text-[16px] font-semibold text-[var(--text)] truncate">#{activeBooking.driver_id.split('-')[0].toUpperCase()}</div>
                               </div>
                             </div>
-                            <LucideInfo size={14} className="text-[var(--accent)] opacity-40 shrink-0" />
+                            <LucideInfo size={18} className="text-[var(--muted)] opacity-60 shrink-0" />
+                          </div>
+
+                          <div className="infocard min-w-0 p-5 rounded-[22px]">
+                            <div className="flex items-center justify-between gap-4">
+                              <div className="min-w-0">
+                                <div className="text-[11px] font-semibold text-[var(--muted)] uppercase tracking-[0.14em]">Pickup OTP</div>
+                                <div className="text-[13px] font-medium text-[var(--muted)] mt-1">Share this code with the driver at pickup.</div>
+                              </div>
+                              <div className="shrink-0 text-right">
+                                <div className="text-[30px] font-semibold font-mono text-[var(--text)] tracking-[-0.04em] tabular-nums">2657</div>
+                              </div>
+                            </div>
                           </div>
 
                           <button
                             onClick={() => setIsChatOpen(true)}
-                            className="w-full py-4.5 bg-[var(--accent)] hover:filter hover:brightness-110 text-white rounded-[22px] flex items-center justify-center gap-3 transition-all active:scale-[0.98] shadow-[0_15px_30px_rgba(70,127,227,0.3)]"
+                            className="w-full py-4.5 bg-[var(--accent-deep)] hover:filter hover:brightness-110 text-white rounded-[22px] flex items-center justify-center gap-3 transition-all active:scale-[0.98] shadow-[0_15px_30px_rgba(70,127,227,0.2)]"
                           >
-                            <MessageSquare size={18} />
-                            <span className="text-[11px] font-black uppercase tracking-widest">Establish Comms</span>
+                            <MessageSquare size={20} />
+                            <span className="text-[13px] font-semibold uppercase tracking-[0.12em]">Establish Comms</span>
                           </button>
 
                           <button
@@ -224,8 +221,8 @@ export default function ActiveShipments() {
                             onClick={() => navigate(`/tracking?shipment=${activeShipment.id}`)}
                             className="w-full ghost-button !rounded-[22px] !min-h-[52px] flex items-center justify-center gap-3"
                           >
-                            <LucideMapPin size={18} />
-                            <span className="text-[11px] font-black uppercase tracking-widest">Open Tracking</span>
+                            <LucideMapPin size={20} />
+                            <span className="text-[13px] font-semibold uppercase tracking-[0.12em]">Open Tracking</span>
                           </button>
                         </div>
                       )}
@@ -234,12 +231,12 @@ export default function ActiveShipments() {
                 </div>
 
                 {/* Fleet List / Terminal Switcher */}
-                <div className={`min-w-0 ${mobileView === 'fleet' ? '' : 'hidden xl:block'}`}>
+                <div className={`min-w-0 xl:min-h-0 xl:overflow-y-auto xl:no-scrollbar pr-0.5 ${mobileView === 'fleet' ? '' : 'hidden xl:block'}`}>
                   {visibleShipments.length > 0 && (
                     <div className="space-y-3 mt-0">
                       <div className="flex items-center justify-between px-2 mb-2">
-                        <div className="text-[10px] font-black text-[var(--muted)] uppercase tracking-widest">{t('tracking:flow.switch_terminal', 'Fleet Terminal')}</div>
-                        <div className="text-[9px] font-black text-[var(--accent)] bg-[var(--accent-soft)] px-2 py-0.5 rounded-full uppercase tracking-widest">{visibleShipments.length} Nodes</div>
+                        <div className="text-[11px] font-semibold text-[var(--muted)] uppercase tracking-[0.14em]">{t('tracking:flow.switch_terminal', 'Fleet Terminal')}</div>
+                        <div className="text-[11px] font-semibold text-[var(--accent-ink)] bg-[var(--surface-soft)] px-3 py-1 rounded-full uppercase tracking-[0.1em]">{visibleShipments.length} Nodes</div>
                       </div>
                       <div className="space-y-3">
                         {visibleShipments.map((s) => (
@@ -249,7 +246,7 @@ export default function ActiveShipments() {
                               setSelectedShipmentId(s.id);
                               setMobileView('selected');
                             }}
-                            className={`p-4 rounded-[22px] border cursor-pointer group transition-all duration-340 relative overflow-hidden ${
+                            className={`infocard p-5 rounded-[22px] cursor-pointer group transition-all duration-340 relative overflow-hidden ${
                               selectedShipmentId === s.id
                                 ? 'border-[var(--accent)] bg-[var(--accent-soft)]/[0.08] shadow-[0_10px_20px_rgba(70,127,227,0.1)]'
                                 : 'border-[var(--border)] bg-[var(--surface-soft)] hover:border-[var(--border-strong)]'
@@ -259,13 +256,13 @@ export default function ActiveShipments() {
                             <div className="flex items-center justify-between mb-2 gap-3">
                               <div className="flex items-center gap-2 min-w-0">
                                 <div className={selectedShipmentId === s.id ? 'live-dot' : 'w-2 h-2 rounded-full bg-[var(--muted)] opacity-30'} />
-                                <span className="text-[10px] font-black text-[var(--text)] uppercase truncate">Terminal {s.id.split('-')[0].toUpperCase()}</span>
+                                <span className="text-[13px] font-semibold text-[var(--text)] uppercase truncate">Terminal {s.id.split('-')[0].toUpperCase()}</span>
                               </div>
                               <StatusBadge status={s.status} />
                             </div>
-                            <div className="flex items-center justify-between text-[10px] text-[var(--muted)] font-black uppercase tracking-wider gap-2">
-                              <span className="truncate min-w-0">{s.pickup_address.split(',')[0]} <LucideHistory size={10} className="inline rotate-180" /> {s.drop_address.split(',')[0]}</span>
-                              <span className="font-mono text-[var(--text)] text-right shrink-0">
+                            <div className="flex items-center justify-between text-[12px] text-[var(--muted)] font-medium uppercase tracking-[0.08em] gap-2">
+                              <span className="truncate min-w-0">{s.pickup_address.split(',')[0]} <LucideHistory size={12} className="inline rotate-180" /> {s.drop_address.split(',')[0]}</span>
+                              <span className="font-mono text-[15px] text-[var(--text)] text-right shrink-0">
                                 {'\u20B9'}{Math.round(s.bookings?.[0]?.agreed_price ?? s.price).toLocaleString()}
                               </span>
                             </div>

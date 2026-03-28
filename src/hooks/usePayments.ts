@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/stores/authStore'
-import type { Payment } from '@/types/app.types'
+import type { PaymentWithRelations } from '@/types/app.types'
 
 export function usePayments() {
-  const { user } = useAuthStore()
-  const [payments, setPayments] = useState<Payment[]>([])
+  const { user, initialized } = useAuthStore()
+  const [payments, setPayments] = useState<PaymentWithRelations[]>([])
   const [loading, setLoading]   = useState(true)
   const [error, setError]       = useState<string | null>(null)
   const [filter, setFilter]     = useState({
@@ -20,7 +20,13 @@ export function usePayments() {
   }, [])
 
   const fetchPayments = useCallback(async () => {
-    if (!user?.id) return
+    if (!initialized) return
+    if (!user?.id) {
+      setPayments([])
+      setError(null)
+      setLoading(false)
+      return
+    }
     if (!payments.length) setLoading(true)
     setError(null)
 
@@ -43,15 +49,15 @@ export function usePayments() {
     if (!mountedRef.current) return
     if (err) { setError(err.message); setLoading(false); return }
 
-    setPayments((data as unknown as Payment[]) ?? [])
+    setPayments((data as unknown as PaymentWithRelations[]) ?? [])
     setLoading(false)
-  }, [user?.id])
+  }, [initialized, user?.id])
 
   useEffect(() => { fetchPayments() }, [fetchPayments])
 
   // Realtime subscription
   useEffect(() => {
-    if (!user?.id) return
+    if (!initialized || !user?.id) return
 
     const channel = supabase
       .channel(`rt_payments_${user.id}`)
@@ -89,7 +95,7 @@ export function usePayments() {
       .subscribe()
 
     return () => { supabase.removeChannel(channel) }
-  }, [user?.id, fetchPayments])
+  }, [initialized, user?.id, fetchPayments])
 
   const filteredPayments = useMemo(() => {
     return payments.filter(p => {

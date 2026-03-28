@@ -17,6 +17,9 @@ export function useMessages(shipmentId: string | null) {
 
   // Fetch messages for this shipment
   useEffect(() => {
+    // Reset view immediately when switching threads.
+    setMessages([])
+    setUnread(0)
     if (!user?.id || !shipmentId) { setLoading(false); return }
     setLoading(true)
 

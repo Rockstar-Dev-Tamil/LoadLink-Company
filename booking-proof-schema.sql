@@ -1,0 +1,15 @@
+alter table public.bookings
+add column if not exists current_milestone text,
+add column if not exists loading_proof_url text,
+add column if not exists delivery_proof_url text,
+add column if not exists milestone_history jsonb,
+add column if not exists loading_proof_status text default 'pending' check (loading_proof_status in ('pending', 'accepted', 'declined')),
+add column if not exists loading_proof_uploaded_at timestamptz,
+add column if not exists loading_proof_verified_at timestamptz,
+add column if not exists loading_proof_verified_by uuid references public.profiles(id),
+add column if not exists loading_proof_review_note text,
+add column if not exists delivery_proof_status text default 'pending' check (delivery_proof_status in ('pending', 'accepted', 'declined')),
+add column if not exists delivery_proof_uploaded_at timestamptz,
+add column if not exists delivery_proof_verified_at timestamptz,
+add column if not exists delivery_proof_verified_by uuid references public.profiles(id),
+add column if not exists delivery_proof_review_note text;
