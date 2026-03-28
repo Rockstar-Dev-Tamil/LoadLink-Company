@@ -7,6 +7,7 @@ import { BusinessGuard } from './components/layout/BusinessGuard';
 import { DriverGuard } from './components/layout/DriverGuard';
 import { Shell } from './components/layout/Shell';
 import { PageLoader } from './components/ui/PageLoader';
+import { RootError } from './components/RootError';
 
 // Lazy load pages
 const Login = lazy(() => import('@/pages/Login'));
@@ -51,6 +52,7 @@ const router = createBrowserRouter([
   {
     path: '/',
     element: <LandingRedirect />,
+    errorElement: <RootError />,
   },
   {
     element: <GuestGuard />,
